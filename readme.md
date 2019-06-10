@@ -20,12 +20,12 @@ pins at the RPi MCU. It is submoduled here, can be found directly at https://git
 
 This needs to be done at every boot.
 
-Kudos to danjperron, cmp. (https://www.raspberrypi.org/forums/viewtopic.php?f=98&t=224533&hilit=rs+485#p1383709)
+Kudos to danjperron, cmp. https://www.raspberrypi.org/forums/viewtopic.php?f=98&t=224533&hilit=rs+485#p1383709
 
 
 ## Pinout
 
-Find a good pinout diagram at (https://raw.githubusercontent.com/ppelleti/hs-wiringPi/master/pin-diagram.png).
+Find a good pinout diagram at https://raw.githubusercontent.com/ppelleti/hs-wiringPi/master/pin-diagram.png.
 
 TX is at GPIO14, RX is at GPIO15 and RTS (control line for transmitter enable) is at GPIO17.
 
@@ -36,5 +36,8 @@ TX is at GPIO14, RX is at GPIO15 and RTS (control line for transmitter enable) i
     ser=serial.rs485.RS485(port='/dev/ttyAMA0',baudrate=9600)
     ser.rs485_mode = serial.rs485.RS485Settings(False,True)
     ser.write('a test'.encode('utf-8'))
+
+Find an signal screenshot here:
+![Test1 Signals](./docs/osci1.png)
 
 
