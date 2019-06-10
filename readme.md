@@ -38,6 +38,10 @@ TX is at GPIO14, RX is at GPIO15 and RTS (control line for transmitter enable) i
     ser.write('a test'.encode('utf-8'))
 
 Find an signal screenshot here:
+
 ![Test1 Signals](./docs/osci1.png)
+
+Channel 1 in yellow has the TX line, channel 3 in purple has the RTS (transmitter enable line).
+
 
 
