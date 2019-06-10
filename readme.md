@@ -23,6 +23,12 @@ This needs to be done at every boot.
 Kudos to danjperron, cmp. (https://www.raspberrypi.org/forums/viewtopic.php?f=98&t=224533&hilit=rs+485#p1383709)
 
 
+## Pinout
+
+Find a good pinout diagram at (https://raw.githubusercontent.com/ppelleti/hs-wiringPi/master/pin-diagram.png).
+
+TX is at GPIO14, RX is at GPIO15 and RTS (control line for transmitter enable) is at GPIO17.
+
 
 ## Python snippet to test
 
