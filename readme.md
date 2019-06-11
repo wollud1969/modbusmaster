@@ -37,6 +37,8 @@ TX is at GPIO14, RX is at GPIO15 and RTS (control line for transmitter enable) i
 
 ## Python snippet to test
 
+(See also `./snippets/test1.py`.)
+
     import serial.rs485
     ser=serial.rs485.RS485(port='/dev/ttyAMA0',baudrate=2400)
     ser.rs485_mode = serial.rs485.RS485Settings(False,True)
@@ -46,7 +48,7 @@ Find an signal screenshot here:
 
 ![Test1 Signals](./docs/osci1.png)
 
-Channel 1 in yellow has the TX line, channel 3 in purple has the RTS (transmitter enable line).
+Channel 1 in yellow has the TX line (GPIO14), channel 3 in purple has the RTS (GPIO17, transmitter enable line).
 
 
 
