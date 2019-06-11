@@ -22,6 +22,7 @@ This needs to be done at every boot.
 
 Kudos to danjperron, cmp. https://www.raspberrypi.org/forums/viewtopic.php?f=98&t=224533&hilit=rs+485#p1383709
 
+(Note, please: I do not derive from this software, I use it in an unchanged way. It is not integrated into my sources, it just needs to be called once the RPi has booted.)
 
 ## Pinout
 
