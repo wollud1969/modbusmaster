@@ -30,6 +30,11 @@ Find a good pinout diagram at https://raw.githubusercontent.com/ppelleti/hs-wiri
 TX is at GPIO14, RX is at GPIO15 and RTS (control line for transmitter enable) is at GPIO17.
 
 
+## Schematics
+
+![Schematics](./docs/IMG_1860.jpeg)
+
+
 ## Python snippet to test
 
     import serial.rs485
