@@ -1,7 +1,8 @@
-CFLAGS=-I/opt/bcm2835/include
+CFLAGS=
+LIBS=-lwiringPi
 
-writec.so:	writec.o /opt/bcm2835/lib/libbcm2835.a
-	$(LD) -shared -o $@ $^
+writec.so:	writec.o 
+	$(LD) -shared $(LIBS) -o $@ $^
 
 writec.o:	writec.c
 

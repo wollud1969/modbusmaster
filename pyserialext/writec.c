@@ -6,25 +6,25 @@
 #include <errno.h>
 #include <string.h>
 #include <stdint.h>
-#include <bcm2835.h>
+#include <wiringPi.h>
 
 
-const uint8_t DE_PIN = RPI_V2_GPIO_P1_11;
+const uint8_t DE_PIN = 0;
 
 int set_rs485_mode(int fd) {
-  bcm2835_init();
-  bcm2835_gpio_fsel(DE_PIN, BCM2835_GPIO_FSEL_OUTP);
-  bcm2835_gpio_write(DE_PIN, LOW);
+  wiringPiSetup();
+  pinMode(DE_PIN, OUTPUT);
+  digitalWrite(DE_PIN, HIGH);
 }
 
 ssize_t writec(int fd, char *buf, size_t count) {
-  bcm2835_gpio_write(DE_PIN, LOW);
+  digitalWrite(DE_PIN, LOW);
   ssize_t r = write(fd, buf, count);
   uint8_t lsr;
   do {
     int r = ioctl(fd, TIOCSERGETLSR, &lsr);
   } while (!(lsr & TIOCSER_TEMT));
-  bcm2835_gpio_write(DE_PIN, HIGH);
+  digitalWrite(DE_PIN, HIGH);
 
   return r;
 }
