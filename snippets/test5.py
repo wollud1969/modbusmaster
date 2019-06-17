@@ -1,7 +1,7 @@
 from pymodbus.client.sync import ModbusSerialClient
 import RS485Ext
 
-ser=RS485Ext.RS485Ext(port='/dev/ttyAMA0', baudrate=1200)
+ser=RS485Ext.RS485Ext(port='/dev/ttyAMA0', baudrate=1200, stopbits=2)
 
 client = ModbusSerialClient(method='rtu')
 client.socket = ser
