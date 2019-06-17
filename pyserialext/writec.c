@@ -6,7 +6,7 @@
 
 const uint8_t DE_PIN = 0;
 
-int set_rs485_mode(int fd) {
+int init() {
   wiringPiSetup();
   pinMode(DE_PIN, OUTPUT);
   digitalWrite(DE_PIN, HIGH);
