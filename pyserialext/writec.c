@@ -1,10 +1,5 @@
 #include <unistd.h>
-#include <termios.h>
 #include <sys/ioctl.h>
-#include <stdio.h>
-#include <linux/serial.h>
-#include <errno.h>
-#include <string.h>
 #include <stdint.h>
 #include <wiringPi.h>
 
