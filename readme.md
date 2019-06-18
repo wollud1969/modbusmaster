@@ -120,7 +120,7 @@ But sometimes is does not work:
 
 ![Modbus comm not ok](./docs/modbus-not-ok.png)
 
-The long hold time of the DE (transmitter enable, RTS line) becomes a problem, the response of the device already starts when the transmitter of the master is still enabled and thus the receiver of the master is still disabled.
+The long hold time of about 18ms of the DE (transmitter enable, RTS line) becomes a problem, the response of the device already starts when the transmitter of the master is still enabled and thus the receiver of the master is still disabled.
 
 A couple of experiments with deriving from the `RS485` class of `pyserial` and moving the time critical code (disabling the transmitter after the transmit) into C code failed. It wasn't faster at all. It became obvious that the system call `tcdrain`, which waits for all octets in the buffer to be transmitted returns very late.
 
