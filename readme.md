@@ -11,6 +11,7 @@ Remove mentions of `serial0` from `/boot/cmdline`.
 
 ## Enable rs485 mode
 
+<del>
 Use the submodule rpirtscts to enable to alternate functions of the related
 pins at the RPi MCU. It is submoduled here, can be found directly at https://github.com/mholling/rpirtscts
 
@@ -23,6 +24,7 @@ This needs to be done at every boot.
 Kudos to danjperron, cmp. https://www.raspberrypi.org/forums/viewtopic.php?f=98&t=224533&hilit=rs+485#p1383709
 
 (Note, please: This software is under the GPL 3.0 license. However, I do not derive from this software, I use it in an unchanged way. It is not integrated into my sources, it just needs to be called once the RPi has booted.)
+</del>
 
 ## Pinout
 
