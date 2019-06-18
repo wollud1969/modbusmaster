@@ -143,15 +143,15 @@ Derived class from `RS485` in `pyserial` (maybe this can be switched to the regu
 C code of the function `writec` in the library `writec`:
 
     ssize_t writec(int fd, char *buf, size_t count) {
-    digitalWrite(DE_PIN, HIGH);
-    ssize_t r = write(fd, buf, count);
-    uint8_t lsr;
-    do {
+      digitalWrite(DE_PIN, HIGH);
+      ssize_t r = write(fd, buf, count);
+      uint8_t lsr;
+      do {
         int r = ioctl(fd, TIOCSERGETLSR, &lsr);
-    } while (!(lsr & TIOCSER_TEMT));
-    digitalWrite(DE_PIN, LOW);
+      } while (!(lsr & TIOCSER_TEMT));
+      digitalWrite(DE_PIN, LOW);
 
-    return r;
+      return r;
     }
 
 This change brought the break through:
