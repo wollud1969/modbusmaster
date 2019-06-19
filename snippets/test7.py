@@ -22,12 +22,40 @@ def registersToIeeeFloatReverse(i):
                                  )
                       )[0]
 
+def dataConverter(t, d):
+  if t == 'F':
+    return registersToIeeeFloat(d)
+  elif t == 'RF':
+    return registersToIeeeFloatReverse(d)
+  else:
+    raise Exception("Converter '{0}' is not supported".format(t))
+
+
 class ModbusException(Exception):
   def __init__(self, resp):
     self.msg = str(result)
 
   def __str__(self):
     return self.msg
+
+class ModbusRequestDefinition(object):
+  def __init__(self, unit, address, count, converter, label):
+    self.unit = unit
+    self.address = address
+    self.count = count
+    self.converter = converter
+    self.label = label
+  
+reqs = [
+  ModbusRequestDefinition(1, 0x2000, 2, 'F', 'Voltage'),
+  ModbusRequestDefinition(1, 0x2020, 2, 'F', 'Frequency'),
+  ModbusRequestDefinition(1, 0x2060, 2, 'F', 'Current'),
+  ModbusRequestDefinition(3, 0x0004, 2, 'RF', 'Resistance Channel 1'),
+  ModbusRequestDefinition(3, 0x000C, 2, 'RF', 'Temperature Channel 1'),
+  ModbusRequestDefinition(3, 0x0014, 2, 'RF', 'Resistance Channel 2'),
+  ModbusRequestDefinition(3, 0x001C, 2, 'RF', 'Temperature Channel 2'),
+]
+
 
 
 
@@ -41,65 +69,18 @@ client.connect()
 delay = 0.05
 
 while True:
-  try:
-    # BG-Tech, Voltage
-    result = client.read_holding_registers(address=0x2000, count=2, unit=1)
-    if type(result) == ExceptionResponse:
-      raise ModbusException(result)
-    print("Voltage: {:.2f}".format(registersToIeeeFloat(result.registers)))
-
-    time.sleep(delay)
-
-    # BG-Tech, Frequency
-    result = client.read_holding_registers(address=0x2020, count=2, unit=1)
-    if type(result) == ExceptionResponse:
-      raise ModbusException(result)
-    print("Frequency: {:.2f}".format(registersToIeeeFloat(result.registers)))
-
-    time.sleep(delay)
-
-    # BG-Tech, Current
-    result = client.read_holding_registers(address=0x2060, count=2, unit=1)
-    if type(result) == ExceptionResponse:
-      raise ModbusException(result)
-    print("Current: {:.2f}".format(registersToIeeeFloat(result.registers)))
-
-    time.sleep(delay)
-
-    # Hottis Thermometer, Resistance Channel 1
-    result = client.read_holding_registers(address=0x0004, count=2, unit=3)
-    if type(result) == ExceptionResponse:
-      raise ModbusException(result)
-    print("Resistance Channel 1: {:.2f}".format(registersToIeeeFloatReverse(result.registers)))
-
-    time.sleep(delay)
-
-    # Hottis Thermometer, Temperature Channel 1
-    result = client.read_holding_registers(address=0x000c, count=2, unit=3)
-    if type(result) == ExceptionResponse:
-      raise ModbusException(result)
-    print("Temperature Channel 1: {:.2f}".format(registersToIeeeFloatReverse(result.registers)))
-
-    time.sleep(delay)
-
-    # Hottis Thermometer, Resistance Channel 2
-    result = client.read_holding_registers(address=0x0014, count=2, unit=3)
-    if type(result) == ExceptionResponse:
-      raise ModbusException(result)
-    print("Resistance Channel 2: {:.2f}".format(registersToIeeeFloatReverse(result.registers)))
-
-    time.sleep(delay)
-
-    # Hottis Thermometer, Temperature Channel 2
-    result = client.read_holding_registers(address=0x001c, count=2, unit=3)
-    if type(result) == ExceptionResponse:
-      raise ModbusException(result)
-    print("Temperature Channel 2: {:.2f}".format(registersToIeeeFloatReverse(result.registers)))
-  except ModbusException as e:
-    print("ERROR: %s" % e)
-
-  print("-------------")
-  time.sleep(10)
+  for req in reqs:
+    try:
+      time.sleep(delay)
+      result = client.read_holding_registers(req.address, req.count, req.unit)
+      if type(result) in (ExceptionResponse):
+        raise ModbusException(result)
+      print("{0}: {1:.2f}". format(dataConverter(req.converter, result.registers)))
+    except ModbusException as e:
+      print("ERROR: %s" % e)
+    finally:
+      print("-------------")
+      time.sleep(10)
 
 client.close()
 
