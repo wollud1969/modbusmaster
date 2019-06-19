@@ -1,5 +1,6 @@
 from pymodbus.client.sync import ModbusSerialClient
 from pymodbus.pdu import ExceptionResponse
+from pymodbus.exceptions import ModbusIOException
 import RS485Ext
 import struct
 import time
@@ -47,6 +48,8 @@ class ModbusRequestDefinition(object):
     self.label = label
   
 reqs = [
+  ModbusRequestDefinition(4, 0x2000, 2, 'F', '(ERR) Unavailable device'),
+  ModbusRequestDefinition(1, 0x2000, 4, 'F', '(ERR) Wrong register size'),
   ModbusRequestDefinition(1, 0x2000, 2, 'F', 'Voltage'),
   ModbusRequestDefinition(1, 0x2020, 2, 'F', 'Frequency'),
   ModbusRequestDefinition(1, 0x2060, 2, 'F', 'Current'),
@@ -57,13 +60,12 @@ reqs = [
 ]
 
 
-
-
-ser=RS485Ext.RS485Ext(port='/dev/ttyAMA0', baudrate=1200, stopbits=1,
-                      timeout=1)
+def getSerial():
+  return RS485Ext.RS485Ext(port='/dev/ttyAMA0', baudrate=1200, stopbits=1,
+                           timeout=1)
 
 client = ModbusSerialClient(method='rtu')
-client.socket = ser
+client.socket = getSerial()
 client.connect()
 
 delay = 0.05
@@ -72,15 +74,24 @@ while True:
   for req in reqs:
     try:
       time.sleep(delay)
-      result = client.read_holding_registers(req.address, req.count, req.unit)
-      if type(result) in (ExceptionResponse):
+      # print("Trying to read: {0} {1} {2}".format(req.address, req.count, req.unit))
+      result = client.read_holding_registers(address=req.address, 
+                                             count=req.count, 
+                                             unit=req.unit)
+      if type(result) in [ExceptionResponse, ModbusIOException]:
         raise ModbusException(result)
-      print("{0}: {1:.2f}". format(dataConverter(req.converter, result.registers)))
+      print("{0}: {1:.2f}".format(req.label, 
+                                  dataConverter(req.converter, 
+                                                result.registers)))
     except ModbusException as e:
-      print("ERROR: %s" % e)
-    finally:
-      print("-------------")
-      time.sleep(10)
+      print("ERROR when querying '{0}': {1!s}".format(req.label, e))
+      if client.socket is None:
+        print("renew socket")
+        client.socket = getSerial()
+
+  print("-------------")
+  time.sleep(10)
+
 
 client.close()
 
