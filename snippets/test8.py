@@ -165,13 +165,13 @@ class CmdInterpreter(cmd.Cmd):
         self.use_rawinput = False
 
     def do_test(self, arg):
-        self.stdout.write("This is the test response")
+        self.stdout.write("This is the test response\n\r")
 
     def do_notify(self, arg):
         nf.notify()
 
     def do_bye(self, arg):
-        self.stdout.write("Bye!")
+        self.stdout.write("Bye!\n\r")
         return True
 
 
@@ -180,6 +180,7 @@ class CmdHandle(socketserver.StreamRequestHandler):
         cmd = CmdInterpreter(io.TextIOWrapper(self.rfile), io.TextIOWrapper(self.wfile))
         try:
             cmd.cmdloop()
+            print("Cmd handle terminated")
         except ConnectionAbortedError as e:
             print("Cmd handle externally interrupted")
 
