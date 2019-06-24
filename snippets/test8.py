@@ -95,6 +95,7 @@ class ScanRateConsideringQueueFeeder(threading.Thread):
         super(ScanRateConsideringQueueFeeder, self).__init__()
         self.registers = registers
         self.queue = queue
+        self.delayEvent = threading.Event()
 
     def run(self):
         while True:
@@ -108,6 +109,7 @@ class ScanRateConsideringQueueFeeder(threading.Thread):
             for r in registersToBeHandled:
                 self.queue.put(r)
                 r.enqueued = True
+            self.delayEvent.wait(min([r.scanRate.total_seconds() for r in self.registers if r.scanRate]))
 
 
 class CommunicationProcessor(threading.Thread):
