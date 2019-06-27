@@ -311,8 +311,9 @@ class CmdInterpreter(cmd.Cmd):
                     raise CmdInterpreterException('writeTopic must not be set when scanRate is zero')
                 if feedbackTopic:
                     raise CmdInterpreterException('feedbackTopic must not be set when scanRate is zero')
-            if registerType not in ['HoldingRegister']:
-                raise CmdInterpreterException('Unknown register type {0}'.format(registerType))
+            allowedRegisterTypes = ['HoldingRegister']
+            if registerType not in allowedRegisterTypes:
+                raise CmdInterpreterException('Unknown register type {0}, allowed are {1!s}'.format(registerType, allowedRegisterTypes))
 
 
         except ValueError as e:
