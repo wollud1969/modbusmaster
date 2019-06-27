@@ -5,6 +5,7 @@ import socketserver
 import cmd
 import io
 import paho.mqtt.client as mqtt
+import re
 
 
 class Config(object):
@@ -233,6 +234,18 @@ class MyPriorityQueue(queue.PriorityQueue):
         i = super()._get()
         return i.itemWithPriority
 
+class CmdInterpreterException(ValueError): pass
+
+def parseIntArbitraryBase(s):
+    i = 0
+    if s.startswith('0x'):
+        i = int(s, 16)
+    elif s.startswith('0b'):
+        i = int(s, 2)
+    else:
+        i = int(s, 10)
+    return i
+
 class CmdInterpreter(cmd.Cmd):
     def __init__(self, infile, outfile, notifier, registers):
         super().__init__(stdin=infile, stdout=outfile)
@@ -241,6 +254,7 @@ class CmdInterpreter(cmd.Cmd):
         self.registers = registers
         self.prompt = "test8> "
         self.intro = "test8 admin interface"
+        self.splitterRe = re.compile('\s+')
 
     def __print(self, text):
         self.stdout.write(text)
@@ -260,12 +274,79 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("Bye!")
         return True
     
+    def do_add(self, arg):
+        try:
+            (registerType, label, unit, address, count, scanrate, readTopic, writeTopic, feedbackTopic) = self.splitterRe.split(arg)
+            self.__println("RegisterType:  {0}".format(registerType))
+            self.__println("Label:         {0}".format(label))
+            self.__println("Unit:          {0}".format(unit))
+            self.__println("Address:       {0}".format(address))
+            self.__println("Count:         {0}".format(count))
+            self.__println("ScanRate:      {0}".format(scanrate))
+            self.__println("ReadTopic:     {0}".format(readTopic))
+            self.__println("WriteTopic:    {0}".format(writeTopic))
+            self.__println("FeedbackTopic: {0}".format(feedbackTopic))
+
+            if readTopic == 'None':
+                readTopic = None
+            if writeTopic == 'None':
+                writeTopic = None
+            if feedbackTopic == 'None':
+                feedbackTopic = None
+            unit = parseIntArbitraryBase(unit)
+            address = parseIntArbitraryBase(address)
+            count = parseIntArbitraryBase(count)
+            scanrate = float(scanrate)
+            if scanrate == 0:
+                if readTopic:
+                    raise CmdInterpreterException('readTopic must not be set when scanRate is zero')
+                if not writeTopic:
+                    raise CmdInterpreterException('writeTopic must be set when scanRate is zero')
+                if not feedbackTopic:
+                    raise CmdInterpreterException('feedbackTopic must be set when scanRate is zero')
+            else:
+                if not readTopic:
+                    raise CmdInterpreterException('readTopic must be set when scanRate is zero')
+                if writeTopic:
+                    raise CmdInterpreterException('writeTopic must not be set when scanRate is zero')
+                if feedbackTopic:
+                    raise CmdInterpreterException('feedbackTopic must not be set when scanRate is zero')
+            if registerType not in ['HoldingRegister']:
+                raise CmdInterpreterException('Unknown register type {0}'.format(registerType))
+
+
+        except ValueError as e:
+            self.__println("ERROR: {0!s}, {1!s}".format(e.__class__.__name__, e))
+
+    def help_add(self):
+        # HoldingRegisterDatapoint('Voltage', 1, 0x2000, 2, datetime.timedelta(seconds=10), 'Pub/Voltage', None, None),
+        self.__println("Usage: add <RegisterType> <Label> <Unit> <Address> <Count> <ScanRate>")
+        self.__println("           <ReadTopic> <WriteTopic> <FeedbackTopic>")
+        self.__println("---------------------------------------------------------------------")
+        self.__println("<RegisterType>               One of HoldingRegister, ...")
+        self.__println("<Label>                      Descriptive label")
+        self.__println("<Unit>                       Modbus address of the device")
+        self.__println("<Address>                    Register address within the device")
+        self.__println("<Count>                      Count of registers to be read or write in words")
+        self.__println("<ScanRate>                   Scanrate in seconds (float), for write datapoints")
+        self.__println("                             set to zero (0)")
+        self.__println("<ReadTopic>                  Topic to publish read data")
+        self.__println("<WriteTopic>                 Topic to be subscribe to receive data to be")
+        self.__println("                             written")
+        self.__println("<FeedbackTopic>              Topic to publish feedback after a write process")
+        self.__println("")
+        self.__println("For read items the <ScanRate> must be non-zero, a <ReadTopic> must be set and")
+        self.__println("<WriteTopic> and <FeedbackTopic> must be <None>.")
+        self.__println("For write items the <ScanRate> must be zero, <ReadTopic> must be <None> and ")
+        self.__println("<WriteTopic> and <FeedbackTopic> must be set.")
+
     def do_list(self, arg):
         for i, r in enumerate(self.registers):
             self.__println("#{0}: {1!s}".format(i, r))
     
     def help_list(self):
         self.__println("Usage: list")
+        self.__println("-----------")
         self.__println("List the configured datapoints")
 
     def do_del(self, arg):
