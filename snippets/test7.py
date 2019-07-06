@@ -48,11 +48,11 @@ class ModbusRequestDefinition(object):
     self.label = label
   
 reqs = [
-  ModbusRequestDefinition(4, 0x2000, 2, 'F', '(ERR) Unavailable device'),
-  ModbusRequestDefinition(1, 0x2000, 4, 'F', '(ERR) Wrong register size'),
-  ModbusRequestDefinition(1, 0x2000, 2, 'F', 'Voltage'),
-  ModbusRequestDefinition(1, 0x2020, 2, 'F', 'Frequency'),
-  ModbusRequestDefinition(1, 0x2060, 2, 'F', 'Current'),
+#  ModbusRequestDefinition(4, 0x2000, 2, 'F', '(ERR) Unavailable device'),
+#  ModbusRequestDefinition(1, 0x2000, 4, 'F', '(ERR) Wrong register size'),
+#  ModbusRequestDefinition(1, 0x2000, 2, 'F', 'Voltage'),
+#  ModbusRequestDefinition(1, 0x2020, 2, 'F', 'Frequency'),
+#  ModbusRequestDefinition(1, 0x2060, 2, 'F', 'Current'),
   ModbusRequestDefinition(3, 0x0004, 2, 'RF', 'Resistance Channel 1'),
   ModbusRequestDefinition(3, 0x000C, 2, 'RF', 'Temperature Channel 1'),
   ModbusRequestDefinition(3, 0x0014, 2, 'RF', 'Resistance Channel 2'),
@@ -69,6 +69,7 @@ client.socket = getSerial()
 client.connect()
 
 delay = 0.05
+period = 1.0
 
 while True:
   for req in reqs:
@@ -90,7 +91,7 @@ while True:
         client.socket = getSerial()
 
   print("-------------")
-  time.sleep(10)
+  time.sleep(period)
 
 
 client.close()
