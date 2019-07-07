@@ -40,7 +40,8 @@ class ModbusException(Exception):
     return self.msg
 
 class ModbusRequestDefinition(object):
-  def __init__(self, unit, address, count, converter, label):
+  def __init__(self, kind, unit, address, count, converter, label):
+    self.kind = kind
     self.unit = unit
     self.address = address
     self.count = count
@@ -53,10 +54,11 @@ reqs = [
 #  ModbusRequestDefinition(1, 0x2000, 2, 'F', 'Voltage'),
 #  ModbusRequestDefinition(1, 0x2020, 2, 'F', 'Frequency'),
 #  ModbusRequestDefinition(1, 0x2060, 2, 'F', 'Current'),
-  ModbusRequestDefinition(3, 0x0004, 2, 'RF', 'Resistance Channel 1'),
-  ModbusRequestDefinition(3, 0x000C, 2, 'RF', 'Temperature Channel 1'),
-  ModbusRequestDefinition(3, 0x0014, 2, 'RF', 'Resistance Channel 2'),
-  ModbusRequestDefinition(3, 0x001C, 2, 'RF', 'Temperature Channel 2'),
+  ModbusRequestDefinition('H', 3, 0x0004, 2, 'RF', 'Resistance Channel 1'),
+  ModbusRequestDefinition('H', 3, 0x000C, 2, 'RF', 'Temperature Channel 1'),
+  ModbusRequestDefinition('H', 3, 0x0014, 2, 'RF', 'Resistance Channel 2'),
+  ModbusRequestDefinition('H', 3, 0x001C, 2, 'RF', 'Temperature Channel 2'),
+  ModbusRequestDefinition('D', 4, 0x0000, 1, '', 'Discrete Input'),
 ]
 
 
@@ -75,15 +77,23 @@ while True:
   for req in reqs:
     try:
       time.sleep(delay)
-      # print("Trying to read: {0} {1} {2}".format(req.address, req.count, req.unit))
-      result = client.read_holding_registers(address=req.address, 
-                                             count=req.count, 
+      if req.kind == 'H':
+        # print("Trying to read: {0} {1} {2}".format(req.address, req.count, req.unit))
+        result = client.read_holding_registers(address=req.address, 
+                                               count=req.count, 
+                                               unit=req.unit)
+        if type(result) in [ExceptionResponse, ModbusIOException]:
+          raise ModbusException(result)
+        print("{0}: {1:.2f}".format(req.label, 
+                                    dataConverter(req.converter, 
+                                                  result.registers)))
+      elif req.kind == 'D':
+        result = client.read_discrete_inputs(address=req.address,
+                                             count=req.count,
                                              unit=req.unit)
-      if type(result) in [ExceptionResponse, ModbusIOException]:
-        raise ModbusException(result)
-      print("{0}: {1:.2f}".format(req.label, 
-                                  dataConverter(req.converter, 
-                                                result.registers)))
+        if type(result) in [ExceptionResponse, ModbusIOException]:
+          raise ModbusException(result)
+        print("{0}: {1!s}".format(req.label, result.bits))        
     except ModbusException as e:
       print("ERROR when querying '{0}': {1!s}".format(req.label, e))
       if client.socket is None:
