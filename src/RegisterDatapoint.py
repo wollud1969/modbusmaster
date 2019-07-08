@@ -145,7 +145,8 @@ class DiscreteInputDatapoint(AbstractModbusDatapoint):
                                              unit=self.unit)
         if type(result) in [ExceptionResponse, ModbusIOException]:
             raise DatapointException(result)
-        if not self.updateOnly or (result.registers != self.lastValue):
+        if not self.updateOnly or (result.bits != self.lastValue):
+            self.lastValue = result.bits
             # print("{0}: {1!s}".format(self.label, result.bits))        
             pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.bits)))
 
