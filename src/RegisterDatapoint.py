@@ -21,7 +21,7 @@ class AbstractModbusDatapoint(object):
             self.priority = 0
 
     def __str__(self):
-        return "{0}, {1}: Unit: {2},  Address: {3}, Count: {4}, Scanrate: {5}".format(self.type, 
+        return "{0}, {1}: unit: {2},  address: {3}, count: {4}, scanRate: {5}".format(self.type, 
                                                                                       self.label, 
                                                                                       self.unit, 
                                                                                       self.address, 
@@ -43,7 +43,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
         self.type = 'holding register'
 
     def __str__(self):
-        return "[{0!s}, Read: {1}, Write: {2}, Feedback: {3}".format(super().__str__(), self.publishTopic, self.subscribeTopic, self.feedbackTopic)
+        return "[{0!s}, publishTopic: {1}, subscribeTopic: {2}, feedbackTopic: {3}".format(super().__str__(), self.publishTopic, self.subscribeTopic, self.feedbackTopic)
 
     def process(self, client, pubQueue):
         successFull = True
@@ -92,7 +92,7 @@ class ReadOnlyDatapoint(AbstractModbusDatapoint):
         self.lastContact = None
 
     def __str__(self):
-        return "[{0!s}, UpdateOnly: {1}, Read: {2}".format(super().__str__(), self.updateOnly, self.publishTopic)
+        return "[{0!s}, updateOnly: {1}, publishTopic: {2}".format(super().__str__(), self.updateOnly, self.publishTopic)
 
 
 
