@@ -1,6 +1,9 @@
 import datetime
+from pymodbus.pdu import ExceptionResponse
+from pymodbus.exceptions import ModbusIOException
 
 
+class DatapointException(Exception): pass
 
 class AbstractModbusDatapoint(object):
     def __init__(self, label, unit, address, count, scanRate):
@@ -19,7 +22,7 @@ class AbstractModbusDatapoint(object):
     def __str__(self):
         return "{0}, {1}: Unit: {2},  Address: {3}, Count: {4}".format(self.type, self.label, self.unit, self.address, self.count)
 
-    def process(self):
+    def process(self, client):
         raise NotImplementedError
 
 
@@ -36,7 +39,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
     def __str__(self):
         return "[{0!s}, Read: {1}, Write: {2}, Feedback: {3}".format(super().__str__(), self.publishTopic, self.subscribeTopic, self.feedbackTopic)
 
-    def process(self):
+    def process(self, client):
         successFull = False
         giveUp = False
         if self.writeRequestValue:
@@ -53,6 +56,13 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
         else:
             # perform read operation
             print("Holding register, perform read operation")
+            result = client.read_holding_registers(address=self.address, 
+                                                   count=self.count, 
+                                                   unit=self.unit)
+            if type(result) in [ExceptionResponse, ModbusIOException]:
+                raise DatapointException(result)
+            print("{0}: {1!s}".format(self.label, result.registers))
+
             if successFull:
                 self.lastContact = datetime.datetime.now()
                 # publish value
@@ -79,10 +89,17 @@ class InputRegisterDatapoint(AbstractModbusDatapoint):
     def __str__(self):
         return "[{0!s}, {1}".format(super().__str__(), self.publishTopic)
 
-    def process(self):
+    def process(self, client):
         successFull = False
         giveUp = False
         # perform read operation
+        result = client.read_input_registers(address=self.address,
+                                             count=self.count,
+                                             unit=self.unit)
+        if type(result) in [ExceptionResponse, ModbusIOException]:
+            raise DatapointException(result)
+        print("{0}: {1!s}".format(self.label, result.registers))        
+
         print("Input register, perform read operation")
         if successFull:
             self.lastContact = datetime.datetime.now()

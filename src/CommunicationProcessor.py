@@ -1,5 +1,8 @@
 import threading
 import datetime
+import RS485Ext
+import RegisterDatapoint
+from pymodbus.client.sync import ModbusSerialClient
 
 class CommunicationProcessor(threading.Thread):
     def __init__(self, config, queue):
@@ -8,10 +11,27 @@ class CommunicationProcessor(threading.Thread):
         self.queue = queue
         self.daemon = True
 
+    def __getSerial(self):
+        return RS485Ext.RS485Ext(port=self.config.serialPort, baudrate=self.config.serialBaudRate, stopbits=1,
+                                 timeout=1)
+
+
     def run(self):
+        client = ModbusSerialClient(method='rtu')
+        client.socket = self.getSerial()
+        client.connect()
+
         while True:
             r = self.queue.get()
-            r.process()
-            r.lastContact = datetime.datetime.now()
-            print("Dequeued: {0!s}".format(r))
-            r.enqueued = False
+            try:
+                print("Dequeued: {0!s}".format(r))
+                r.enqueued = False
+                r.process(client)
+            except RegisterDatapoint.DatapointException as e:
+                print("ERROR when processing '{0}': {1!s}".format(r.label, e))
+                if client.socket is None:
+                    print("renew socket")
+                    client.socket = self.getSerial()
+
+
+
