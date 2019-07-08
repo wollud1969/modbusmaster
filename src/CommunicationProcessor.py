@@ -18,7 +18,7 @@ class CommunicationProcessor(threading.Thread):
 
     def run(self):
         client = ModbusSerialClient(method='rtu')
-        client.socket = self.getSerial()
+        client.socket = self.__getSerial()
         client.connect()
 
         while True:
@@ -31,7 +31,7 @@ class CommunicationProcessor(threading.Thread):
                 print("ERROR when processing '{0}': {1!s}".format(r.label, e))
                 if client.socket is None:
                     print("renew socket")
-                    client.socket = self.getSerial()
+                    client.socket = self.__getSerial()
 
 
 
