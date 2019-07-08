@@ -1,6 +1,6 @@
 import threading
 import datetime
-from AbstractNotificationReceiver import AbstractNotificationReceiver
+from NotificationForwarder import AbstractNotificationReceiver
 
 
 class ScanRateConsideringQueueFeeder(threading.Thread, AbstractNotificationReceiver):
