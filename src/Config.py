@@ -5,4 +5,6 @@ class Config(object):
         self.mqttBrokerPort = 1883
         self.mqttLogin = ''
         self.mqttPassword = ''
+        self.cmdAddress = '127.0.0.1'
+        self.cmdPort = 9999
 

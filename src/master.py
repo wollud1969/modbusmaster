@@ -35,5 +35,5 @@ if __name__ == "__main__":
     nf.register(qf)
     qf.start()
 
-    cs = CmdServer.CmdServer(config, '127.0.0.1',9999, nf, datapoints)
+    cs = CmdServer.CmdServer(config, nf, datapoints)
     cs.start()

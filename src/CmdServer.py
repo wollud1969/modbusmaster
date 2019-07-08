@@ -156,9 +156,10 @@ class MyCmdUserData(object):
         self.registers = registers
 
 class CmdServer(threading.Thread):
-    def __init__(self, address, port, notifier, registers):
+    def __init__(self, config, notifier, registers):
         super().__init__()
-        self.server = MyThreadingTCPServer((address, port), CmdHandle, MyCmdUserData(notifier, registers))
+        self.config = config
+        self.server = MyThreadingTCPServer((config.cmdAddress, config.cmdPort), CmdHandle, MyCmdUserData(notifier, registers))
 
     def start(self):
         self.server.serve_forever()
