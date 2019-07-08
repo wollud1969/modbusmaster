@@ -86,8 +86,10 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
 
 
 class InputRegisterDatapoint(AbstractModbusDatapoint):
-    def __init__(self, label, unit, address, count, scanRate, publishTopic):
+    def __init__(self, label, unit, address, count, scanRate, updateOnly, publishTopic):
         super().__init__(label, unit, address, count, scanRate)
+        self.updateOnly = updateOnly
+        self.lastValue = None
         self.publishTopic = publishTopic
         self.lastContact = None
         self.type = 'input register'
@@ -105,8 +107,10 @@ class InputRegisterDatapoint(AbstractModbusDatapoint):
                                              unit=self.unit)
         if type(result) in [ExceptionResponse, ModbusIOException]:
             raise DatapointException(result)
-        # print("{0}: {1!s}".format(self.label, result.registers))        
-        pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.registers)))
+        if not self.updateOnly or (result.registers != self.lastValue):
+            self.lastValue = result.registers
+            # print("{0}: {1!s}".format(self.label, result.registers))        
+            pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.registers)))
 
         if successFull:
             self.lastContact = datetime.datetime.now()
@@ -120,8 +124,10 @@ class InputRegisterDatapoint(AbstractModbusDatapoint):
 
 
 class DiscreteInputDatapoint(AbstractModbusDatapoint):
-    def __init__(self, label, unit, address, count, scanRate, publishTopic):
+    def __init__(self, label, unit, address, count, scanRate, updateOnly, publishTopic):
         super().__init__(label, unit, address, count, scanRate)
+        self.updateOnly = updateOnly
+        self.lastValue = None
         self.publishTopic = publishTopic
         self.lastContact = None
         self.type = 'discrete input'
@@ -139,8 +145,9 @@ class DiscreteInputDatapoint(AbstractModbusDatapoint):
                                              unit=self.unit)
         if type(result) in [ExceptionResponse, ModbusIOException]:
             raise DatapointException(result)
-        # print("{0}: {1!s}".format(self.label, result.bits))        
-        pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.bits)))
+        if not self.updateOnly or (result.registers != self.lastValue):
+            # print("{0}: {1!s}".format(self.label, result.bits))        
+            pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.bits)))
 
         if successFull:
             self.lastContact = datetime.datetime.now()

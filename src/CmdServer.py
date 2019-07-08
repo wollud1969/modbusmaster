@@ -115,30 +115,37 @@ class CmdInterpreter(cmd.Cmd):
 
     def do_add_ir(self, arg):
         try:
-            (label, unit, address, count, scanrate, readTopic) = self.splitterRe.split(arg)
+            (label, unit, address, count, scanrate, updateOnly, readTopic) = self.splitterRe.split(arg)
             self.__println("Label:         {0}".format(label))
             self.__println("Unit:          {0}".format(unit))
             self.__println("Address:       {0}".format(address))
             self.__println("Count:         {0}".format(count))
             self.__println("ScanRate:      {0}".format(scanrate))
+            self.__println("UpdateOnly:    {0}".format(updateOnly))
             self.__println("ReadTopic:     {0}".format(readTopic))
 
             if readTopic == 'None':
                 readTopic = None
+            if updateOnly in ['true', 'True', 'yes', 'Yes']:
+                updateOnly = True
+            elif updateOnly in ['false', 'False', 'no', 'No']:
+                updateOnly = False
+            else:
+                raise CmdInterpreterException('updateOnly must be true or false, yes or no')
             unit = parseIntArbitraryBase(unit)
             address = parseIntArbitraryBase(address)
             count = parseIntArbitraryBase(count)
             scanrate = float(scanrate)
             if scanrate == 0.0:
                 raise CmdInterpreterException('scanRate must not be zero')
-            r = RegisterDatapoint.InputRegisterDatapoint(label, unit, address, count, datetime.timedelta(seconds=scanrate), readTopic)
+            r = RegisterDatapoint.InputRegisterDatapoint(label, unit, address, count, datetime.timedelta(seconds=scanrate), updateOnly, readTopic)
             self.registers.append(r)
         except ValueError as e:
             self.__println("ERROR: {0!s}, {1!s}".format(e.__class__.__name__, e))
 
     def help_add_ir(self):
         self.__println("Usage: add <Label> <Unit> <Address> <Count> <ScanRate>")
-        self.__println("           <ReadTopic>")
+        self.__println("           <UpdateOnly> <ReadTopic>")
         self.__println("Adds an input register")
         self.__println("DO NOT FORGET TO SAVE AFTERWARDS!")
         self.__println("---------------------------------------------------------------------")
@@ -147,34 +154,42 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("<Address>                    Register address within the device")
         self.__println("<Count>                      Count of registers to be read in words")
         self.__println("<ScanRate>                   Scanrate in seconds (float)")
+        self.__println("<UpdateOnly>                 Publish only when value has changed")
         self.__println("<ReadTopic>                  Topic to publish read data")
 
     def do_add_di(self, arg):
         try:
-            (label, unit, address, count, scanrate, readTopic) = self.splitterRe.split(arg)
+            (label, unit, address, count, scanrate, updateOnly, readTopic) = self.splitterRe.split(arg)
             self.__println("Label:         {0}".format(label))
             self.__println("Unit:          {0}".format(unit))
             self.__println("Address:       {0}".format(address))
             self.__println("Count:         {0}".format(count))
             self.__println("ScanRate:      {0}".format(scanrate))
+            self.__println("UpdateOnly:    {0}".format(updateOnly))
             self.__println("ReadTopic:     {0}".format(readTopic))
 
             if readTopic == 'None':
                 readTopic = None
+            if updateOnly in ['true', 'True', 'yes', 'Yes']:
+                updateOnly = True
+            elif updateOnly in ['false', 'False', 'no', 'No']:
+                updateOnly = False
+            else:
+                raise CmdInterpreterException('updateOnly must be true or false, yes or no')
             unit = parseIntArbitraryBase(unit)
             address = parseIntArbitraryBase(address)
             count = parseIntArbitraryBase(count)
             scanrate = float(scanrate)
             if scanrate == 0.0:
                 raise CmdInterpreterException('scanRate must not be zero')
-            r = RegisterDatapoint.DiscreteInputDatapoint(label, unit, address, count, datetime.timedelta(seconds=scanrate), readTopic)
+            r = RegisterDatapoint.DiscreteInputDatapoint(label, unit, address, count, datetime.timedelta(seconds=scanrate), updateOnly, readTopic)
             self.registers.append(r)
         except ValueError as e:
             self.__println("ERROR: {0!s}, {1!s}".format(e.__class__.__name__, e))
 
     def help_add_di(self):
         self.__println("Usage: add <Label> <Unit> <Address> <Count> <ScanRate>")
-        self.__println("           <ReadTopic>")
+        self.__println("           <UpdateOnly> <ReadTopic>")
         self.__println("Adds a discrete input")
         self.__println("DO NOT FORGET TO SAVE AFTERWARDS!")
         self.__println("---------------------------------------------------------------------")
@@ -183,6 +198,7 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("<Address>                    Register address within the device")
         self.__println("<Count>                      Count of registers to be read in words")
         self.__println("<ScanRate>                   Scanrate in seconds (float)")
+        self.__println("<UpdateOnly>                 Publish only when value has changed")
         self.__println("<ReadTopic>                  Topic to publish read data")
 
     def do_list(self, arg):
