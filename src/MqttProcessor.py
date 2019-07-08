@@ -22,6 +22,7 @@ class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
         self.client = mqtt.Client(userdata=self)
         self.subscriptions = []
         self.topicRegisterMap ={}
+        self.daemon = True
 
     def __processUpdatedRegisters(self, force=False):
         # print("MqttProcessor.__updateSubscriptions")
@@ -68,8 +69,7 @@ class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
         # print("MqttProcessor.onMessage")
         r = self.topicRegisterMap[topic]
         # print("{0}: {1!s} -> {2!s}".format(topic, payload, r))
-        r.setCommand('w')
-        r.setValue(payload)
+        r.onMessage(payload)
         self.queue.put(r)
 
 

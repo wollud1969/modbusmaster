@@ -7,4 +7,5 @@ class Config(object):
         self.mqttPassword = ''
         self.cmdAddress = '127.0.0.1'
         self.cmdPort = 9999
+        self.registerFile = 'registers.pkl'
 

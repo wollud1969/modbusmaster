@@ -10,6 +10,7 @@ class ScanRateConsideringQueueFeeder(threading.Thread, AbstractNotificationRecei
         self.registers = registers
         self.queue = queue
         self.delayEvent = threading.Event()
+        self.daemon = True
 
     def getMinimalScanrate(self):
             return min([r.scanRate.total_seconds() for r in self.registers if r.scanRate])
@@ -29,7 +30,6 @@ class ScanRateConsideringQueueFeeder(threading.Thread, AbstractNotificationRecei
             ]
             registersToBeHandled.sort(key=lambda x : x.scanRate)
             for r in registersToBeHandled:
-                r.setCommand('r')
                 self.queue.put(r)
                 r.enqueued = True
             self.delayEvent.wait(self.delay)
