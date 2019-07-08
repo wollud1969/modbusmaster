@@ -61,13 +61,13 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
                     self.writeRequestValue = None
         else:
             # perform read operation
-            print("Holding register, perform read operation")
+            # print("Holding register, perform read operation")
             result = client.read_holding_registers(address=self.address, 
                                                    count=self.count, 
                                                    unit=self.unit)
             if type(result) in [ExceptionResponse, ModbusIOException]:
                 raise DatapointException(result)
-            print("{0}: {1!s}".format(self.label, result.registers))
+            # print("{0}: {1!s}".format(self.label, result.registers))
             pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.registers)))
             if successFull:
                 self.lastContact = datetime.datetime.now()

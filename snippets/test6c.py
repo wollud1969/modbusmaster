@@ -9,7 +9,7 @@ client.socket = ser
 client.connect()
 
 try:
-   result = client.write_register(address=0x9c47, unit=4, value=0x8000)
+   result = client.write_register(address=0x9c48, unit=4, value=0x000F)
    # result = client.write_coil(address=0x0000, unit=4, value=1)
    print(result)
 except Exception as e:
