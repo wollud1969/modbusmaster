@@ -83,19 +83,23 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
         self.writeRequestValue = value
 
 
-
-
-class InputRegisterDatapoint(AbstractModbusDatapoint):
+class ReadOnlyDatapoint(AbstractModbusDatapoint):
     def __init__(self, label, unit, address, count, scanRate, updateOnly, publishTopic):
         super().__init__(label, unit, address, count, scanRate)
         self.updateOnly = updateOnly
         self.lastValue = None
         self.publishTopic = publishTopic
         self.lastContact = None
-        self.type = 'input register'
 
     def __str__(self):
         return "[{0!s}, UpdateOnly: {1}, Read: {2}".format(super().__str__(), self.updateOnly, self.publishTopic)
+
+
+
+class InputRegisterDatapoint(ReadOnlyDatapoint):
+    def __init__(self, label, unit, address, count, scanRate, updateOnly, publishTopic):
+        super().__init__(label, unit, address, count, scanRate, updateOnly, publishTopic)
+        self.type = 'input register'
 
     def process(self, client, pubQueue):
         successFull = True
@@ -123,17 +127,10 @@ class InputRegisterDatapoint(AbstractModbusDatapoint):
                 pass
 
 
-class DiscreteInputDatapoint(AbstractModbusDatapoint):
+class DiscreteInputDatapoint(ReadOnlyDatapoint):
     def __init__(self, label, unit, address, count, scanRate, updateOnly, publishTopic):
-        super().__init__(label, unit, address, count, scanRate)
-        self.updateOnly = updateOnly
-        self.lastValue = None
-        self.publishTopic = publishTopic
-        self.lastContact = None
+        super().__init__(label, unit, address, count, scanRate, updateOnly, publishTopic)
         self.type = 'discrete input'
-
-    def __str__(self):
-        return "[{0!s}, UpdateOnly: {1}, Read: {2}".format(super().__str__(), self.updateOnly, self.publishTopic)
 
     def process(self, client, pubQueue):
         successFull = True
