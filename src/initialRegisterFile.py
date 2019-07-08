@@ -4,8 +4,8 @@ import pickle
 
 
 datapoints = [
-    RegisterDatapoint.InputRegisterDatapoint('Temperature', 5, 0x0001, 1, datetime.timedelta(seconds=1), 'Pub/Temperature'),
-    RegisterDatapoint.InputRegisterDatapoint('Humidity', 5, 0x0002, 1, datetime.timedelta(seconds=1), 'Pub/Humidity'),
+    RegisterDatapoint.InputRegisterDatapoint('Temperature', 5, 0x0001, 1, datetime.timedelta(seconds=0.2), 'Pub/Temperature'),
+    RegisterDatapoint.InputRegisterDatapoint('Humidity', 5, 0x0002, 1, datetime.timedelta(seconds=0.2), 'Pub/Humidity'),
 ]
 
 

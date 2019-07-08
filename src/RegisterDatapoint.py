@@ -94,7 +94,7 @@ class InputRegisterDatapoint(AbstractModbusDatapoint):
         successFull = True
         giveUp = False
         # perform read operation
-        print("Input register, perform read operation")
+        # print("Input register, perform read operation")
         result = client.read_input_registers(address=self.address,
                                              count=self.count,
                                              unit=self.unit)

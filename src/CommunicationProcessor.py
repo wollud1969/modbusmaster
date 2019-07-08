@@ -25,7 +25,7 @@ class CommunicationProcessor(threading.Thread):
         while True:
             r = self.queue.get()
             try:
-                print("Dequeued: {0!s}".format(r))
+                # print("Dequeued: {0!s}".format(r))
                 r.enqueued = False
                 r.process(client, self.pubQueue)
             except RegisterDatapoint.DatapointException as e:
