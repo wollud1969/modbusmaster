@@ -40,7 +40,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
         return "[{0!s}, Read: {1}, Write: {2}, Feedback: {3}".format(super().__str__(), self.publishTopic, self.subscribeTopic, self.feedbackTopic)
 
     def process(self, client):
-        successFull = False
+        successFull = True
         giveUp = False
         if self.writeRequestValue:
             # perform write operation
@@ -90,7 +90,7 @@ class InputRegisterDatapoint(AbstractModbusDatapoint):
         return "[{0!s}, {1}".format(super().__str__(), self.publishTopic)
 
     def process(self, client):
-        successFull = False
+        successFull = True
         giveUp = False
         # perform read operation
         result = client.read_input_registers(address=self.address,
