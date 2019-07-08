@@ -1,6 +1,6 @@
 import threading
 import paho.mqtt.client as mqtt
-from AbstractNotificationReceiver import AbstractNotificationReceiver
+from NotificationForwarder import AbstractNotificationReceiver
 
 
 
