@@ -2,6 +2,7 @@ import CmdServer
 import MqttProcessor
 import CommunicationProcessor
 import MyPriorityQueue
+import queue
 import NotificationForwarder
 import Config
 import ScanRateConsideringQueueFeeder
@@ -13,6 +14,7 @@ import pickle
 
 if __name__ == "__main__":
     queue = MyPriorityQueue.MyPriorityQueue()
+    pubQueue = queue.queue()
     nf = NotificationForwarder.NotificationForwarder()
     config = Config.Config()
 
@@ -21,10 +23,10 @@ if __name__ == "__main__":
         datapoints = pickle.load(f)
     RegisterDatapoint.checkRegisterList(datapoints)
 
-    cp = CommunicationProcessor.CommunicationProcessor(config, queue)
+    cp = CommunicationProcessor.CommunicationProcessor(config, queue, pubQueue)
     cp.start()
 
-    mp = MqttProcessor.MqttProcessor(config, datapoints, queue)
+    mp = MqttProcessor.MqttProcessor(config, datapoints, queue, pubQueue)
     nf.register(mp)
     mp.start()
 

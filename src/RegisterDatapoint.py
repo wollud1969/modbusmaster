@@ -1,6 +1,7 @@
 import datetime
 from pymodbus.pdu import ExceptionResponse
 from pymodbus.exceptions import ModbusIOException
+from src import MqttProcessor
 
 
 class DatapointException(Exception): pass
@@ -39,7 +40,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
     def __str__(self):
         return "[{0!s}, Read: {1}, Write: {2}, Feedback: {3}".format(super().__str__(), self.publishTopic, self.subscribeTopic, self.feedbackTopic)
 
-    def process(self, client):
+    def process(self, client, pubQueue):
         successFull = True
         giveUp = False
         if self.writeRequestValue:
@@ -62,7 +63,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
             if type(result) in [ExceptionResponse, ModbusIOException]:
                 raise DatapointException(result)
             print("{0}: {1!s}".format(self.label, result.registers))
-
+            pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.registers)))
             if successFull:
                 self.lastContact = datetime.datetime.now()
                 # publish value
@@ -89,18 +90,19 @@ class InputRegisterDatapoint(AbstractModbusDatapoint):
     def __str__(self):
         return "[{0!s}, {1}".format(super().__str__(), self.publishTopic)
 
-    def process(self, client):
+    def process(self, client, pubQueue):
         successFull = True
         giveUp = False
         # perform read operation
+        print("Input register, perform read operation")
         result = client.read_input_registers(address=self.address,
                                              count=self.count,
                                              unit=self.unit)
         if type(result) in [ExceptionResponse, ModbusIOException]:
             raise DatapointException(result)
         print("{0}: {1!s}".format(self.label, result.registers))        
+        pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.registers)))
 
-        print("Input register, perform read operation")
         if successFull:
             self.lastContact = datetime.datetime.now()
             # publish value

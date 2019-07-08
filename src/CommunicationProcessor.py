@@ -5,10 +5,11 @@ import RegisterDatapoint
 from pymodbus.client.sync import ModbusSerialClient
 
 class CommunicationProcessor(threading.Thread):
-    def __init__(self, config, queue):
+    def __init__(self, config, queue, pubQueue):
         super().__init__()
         self.config = config
         self.queue = queue
+        self.pubQueue = pubQueue
         self.daemon = True
 
     def __getSerial(self):
@@ -26,7 +27,7 @@ class CommunicationProcessor(threading.Thread):
             try:
                 print("Dequeued: {0!s}".format(r))
                 r.enqueued = False
-                r.process(client)
+                r.process(client, self.pubQueue)
             except RegisterDatapoint.DatapointException as e:
                 print("ERROR when processing '{0}': {1!s}".format(r.label, e))
                 if client.socket is None:

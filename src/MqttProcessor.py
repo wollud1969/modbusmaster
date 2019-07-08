@@ -4,6 +4,11 @@ from NotificationForwarder import AbstractNotificationReceiver
 
 
 
+class PublishItem(object):
+    def __init__(self, topic, payload):
+        self.topic = topic
+        self.payload = payload
+
 def mqttOnConnectCallback(client, userdata, flags, rc):
     userdata.onConnect()
 
@@ -14,11 +19,12 @@ def mqttOnDisconnectCallback(client, userdata, rc):
     userdata.onDisconnect(rc)
 
 class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
-    def __init__(self, config, registers, queue):
+    def __init__(self, config, registers, queue, pubQueue):
         super().__init__()
         self.config = config
         self.registers = registers
         self.queue = queue
+        self.pubQueue = pubQueue
         self.client = mqtt.Client(userdata=self)
         self.subscriptions = []
         self.topicRegisterMap ={}
@@ -56,7 +62,15 @@ class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
         if self.config.mqttLogin and self.config.mqttPassword:
             self.client.username_pw_set(self.config.mqttLogin, self.config.mqttPassword)
         self.client.connect(self.config.mqttBrokerHost, self.config.mqttBrokerPort)
-        self.client.loop_forever()
+        self.client.loop_start()
+
+        while True:
+            pubItem = self.pubQueue.get()
+            if isinstance(pubItem, PublishItem):
+                self.client.publish(pubItem.topic, pubItem.payload)
+            else:
+                print("Invalid object in publish queue")
+
 
     def onConnect(self):
         # print("MqttProcessor.onConnect")
