@@ -149,6 +149,42 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("<ScanRate>                   Scanrate in seconds (float)")
         self.__println("<ReadTopic>                  Topic to publish read data")
 
+    def do_add_di(self, arg):
+        try:
+            (label, unit, address, count, scanrate, readTopic) = self.splitterRe.split(arg)
+            self.__println("Label:         {0}".format(label))
+            self.__println("Unit:          {0}".format(unit))
+            self.__println("Address:       {0}".format(address))
+            self.__println("Count:         {0}".format(count))
+            self.__println("ScanRate:      {0}".format(scanrate))
+            self.__println("ReadTopic:     {0}".format(readTopic))
+
+            if readTopic == 'None':
+                readTopic = None
+            unit = parseIntArbitraryBase(unit)
+            address = parseIntArbitraryBase(address)
+            count = parseIntArbitraryBase(count)
+            scanrate = float(scanrate)
+            if scanrate == 0.0:
+                raise CmdInterpreterException('scanRate must not be zero')
+            r = RegisterDatapoint.DiscreteInputDatapoint(label, unit, address, count, datetime.timedelta(seconds=scanrate), readTopic)
+            self.registers.append(r)
+        except ValueError as e:
+            self.__println("ERROR: {0!s}, {1!s}".format(e.__class__.__name__, e))
+
+    def help_add_di(self):
+        self.__println("Usage: add <Label> <Unit> <Address> <Count> <ScanRate>")
+        self.__println("           <ReadTopic>")
+        self.__println("Adds a discrete input")
+        self.__println("DO NOT FORGET TO SAVE AFTERWARDS!")
+        self.__println("---------------------------------------------------------------------")
+        self.__println("<Label>                      Descriptive label")
+        self.__println("<Unit>                       Modbus address of the device")
+        self.__println("<Address>                    Register address within the device")
+        self.__println("<Count>                      Count of registers to be read in words")
+        self.__println("<ScanRate>                   Scanrate in seconds (float)")
+        self.__println("<ReadTopic>                  Topic to publish read data")
+
     def do_list(self, arg):
         for i, r in enumerate(self.registers):
             self.__println("#{0}: {1!s}".format(i, r))

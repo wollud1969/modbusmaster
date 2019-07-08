@@ -21,7 +21,12 @@ class AbstractModbusDatapoint(object):
             self.priority = 0
 
     def __str__(self):
-        return "{0}, {1}: Unit: {2},  Address: {3}, Count: {4}".format(self.type, self.label, self.unit, self.address, self.count)
+        return "{0}, {1}: Unit: {2},  Address: {3}, Count: {4}, Scanrate: {5}".format(self.type, 
+                                                                                      self.label, 
+                                                                                      self.unit, 
+                                                                                      self.address, 
+                                                                                      self.count,
+                                                                                      self.scanRate)
 
     def process(self, client):
         raise NotImplementedError
@@ -100,7 +105,7 @@ class InputRegisterDatapoint(AbstractModbusDatapoint):
                                              unit=self.unit)
         if type(result) in [ExceptionResponse, ModbusIOException]:
             raise DatapointException(result)
-        print("{0}: {1!s}".format(self.label, result.registers))        
+        # print("{0}: {1!s}".format(self.label, result.registers))        
         pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.registers)))
 
         if successFull:
@@ -112,6 +117,41 @@ class InputRegisterDatapoint(AbstractModbusDatapoint):
                 # backoff and availability handling
                 # give negative feedback
                 pass
+
+
+class DiscreteInputDatapoint(AbstractModbusDatapoint):
+    def __init__(self, label, unit, address, count, scanRate, publishTopic):
+        super().__init__(label, unit, address, count, scanRate)
+        self.publishTopic = publishTopic
+        self.lastContact = None
+        self.type = 'discrete input'
+
+    def __str__(self):
+        return "[{0!s}, {1}".format(super().__str__(), self.publishTopic)
+
+    def process(self, client, pubQueue):
+        successFull = True
+        giveUp = False
+        # perform read operation
+        # print("Discrete input, perform read operation")
+        result = client.read_discrete_inputs(address=self.address,
+                                             count=self.count,
+                                             unit=self.unit)
+        if type(result) in [ExceptionResponse, ModbusIOException]:
+            raise DatapointException(result)
+        # print("{0}: {1!s}".format(self.label, result.bits))        
+        pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.bits)))
+
+        if successFull:
+            self.lastContact = datetime.datetime.now()
+            # publish value
+        else:
+            # retries handling
+            if giveUp:
+                # backoff and availability handling
+                # give negative feedback
+                pass
+
 
 
 def checkRegisterList(registers):
