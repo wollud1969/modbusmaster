@@ -210,6 +210,56 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("-----------")
         self.__println("List the configured datapoints")
 
+    def do_change(self, arg):
+        (idx, key, typ, value) = self.splitterRe.split(arg)
+        try:
+            i = int(idx)
+            r = self.registers[i]
+
+            if typ == 'I':
+                value = parseIntArbitraryBase(value)
+            elif typ == 'F':
+                value = float(value)
+            elif typ == 'B':
+                if value in ['true', 'True', 'yes', 'Yes']:
+                    value = True
+                elif value in ['false', 'False', 'no', 'No']:
+                    value = False
+                else:
+                    raise CmdInterpreterException('boolean value must be true or false, yes or no')
+            elif typ == 'S':
+                # string
+                pass
+            elif typ == 'T':
+                value = datetime.timedelta(seconds=float(value))
+            else:
+                raise CmdInterpreterException('unknown type specifier, must be I, F, B, S or T')
+            
+            if key not in r.__dict__:
+                raise CmdInterpreterException('selected datapoint does not support key')
+            
+            r.__dict__[key] = value
+        except ValueError as e:
+            self.__println("ERROR: {0!s}, {1!s}".format(e.__class__.__name__, e))
+
+    def help_change(self):
+        self.__println("Usage: change <idx> <key> <type> <value>")
+        self.__println("Changes on attribute of a datapoint")
+        self.__println("DO NOT FORGET TO SAVE AFTERWARDS!")
+        self.__println("---------------------------------------------------------------------")
+        self.__println("<idx>                      Index, use list command to find")
+        self.__println("<key>                      Name of attribute")
+        self.__println("<type>                     Type of attribute")
+        self.__println("                           I .. Integer")
+        self.__println("                           F .. Float")
+        self.__println("                           B .. Boolean")
+        self.__println("                           T .. Timedelta, give in seconds")
+        self.__println("                           S .. String")
+        self.__println("<value>                    New value")
+
+
+
+
     def do_del(self, arg):
         try:
             i = int(arg)
