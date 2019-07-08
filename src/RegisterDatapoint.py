@@ -95,7 +95,7 @@ class InputRegisterDatapoint(AbstractModbusDatapoint):
         self.type = 'input register'
 
     def __str__(self):
-        return "[{0!s}, {1}".format(super().__str__(), self.publishTopic)
+        return "[{0!s}, UpdateOnly: {1}, Read: {2}".format(super().__str__(), self.updateOnly, self.publishTopic)
 
     def process(self, client, pubQueue):
         successFull = True
@@ -133,7 +133,7 @@ class DiscreteInputDatapoint(AbstractModbusDatapoint):
         self.type = 'discrete input'
 
     def __str__(self):
-        return "[{0!s}, {1}".format(super().__str__(), self.publishTopic)
+        return "[{0!s}, UpdateOnly: {1}, Read: {2}".format(super().__str__(), self.updateOnly, self.publishTopic)
 
     def process(self, client, pubQueue):
         successFull = True
