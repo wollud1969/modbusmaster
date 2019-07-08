@@ -1,7 +1,7 @@
 import datetime
 from pymodbus.pdu import ExceptionResponse
 from pymodbus.exceptions import ModbusIOException
-from src import MqttProcessor
+import MqttProcessor
 
 
 class DatapointException(Exception): pass

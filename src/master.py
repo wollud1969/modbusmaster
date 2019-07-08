@@ -2,7 +2,7 @@ import CmdServer
 import MqttProcessor
 import CommunicationProcessor
 import MyPriorityQueue
-import queue
+from queue import Queue
 import NotificationForwarder
 import Config
 import ScanRateConsideringQueueFeeder
@@ -14,7 +14,7 @@ import pickle
 
 if __name__ == "__main__":
     queue = MyPriorityQueue.MyPriorityQueue()
-    pubQueue = queue.queue()
+    pubQueue = Queue()
     nf = NotificationForwarder.NotificationForwarder()
     config = Config.Config()
 
