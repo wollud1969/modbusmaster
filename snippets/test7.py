@@ -54,16 +54,18 @@ reqs = [
 #  ModbusRequestDefinition(1, 0x2000, 2, 'F', 'Voltage'),
 #  ModbusRequestDefinition(1, 0x2020, 2, 'F', 'Frequency'),
 #  ModbusRequestDefinition(1, 0x2060, 2, 'F', 'Current'),
-  ModbusRequestDefinition('H', 3, 0x0004, 2, 'RF', 'Resistance Channel 1'),
-  ModbusRequestDefinition('H', 3, 0x000C, 2, 'RF', 'Temperature Channel 1'),
-  ModbusRequestDefinition('H', 3, 0x0014, 2, 'RF', 'Resistance Channel 2'),
-  ModbusRequestDefinition('H', 3, 0x001C, 2, 'RF', 'Temperature Channel 2'),
+#  ModbusRequestDefinition('H', 3, 0x0004, 2, 'RF', 'Resistance Channel 1'),
+#  ModbusRequestDefinition('H', 3, 0x000C, 2, 'RF', 'Temperature Channel 1'),
+#  ModbusRequestDefinition('H', 3, 0x0014, 2, 'RF', 'Resistance Channel 2'),
+#  ModbusRequestDefinition('H', 3, 0x001C, 2, 'RF', 'Temperature Channel 2'),
   ModbusRequestDefinition('D', 4, 0x0000, 1, '', 'Discrete Input'),
+  ModbusRequestDefinition('I', 5, 0x0001, 1, '', 'Temperature'),
+  ModbusRequestDefinition('I', 5, 0x0002, 1, '', 'Humidity'),
 ]
 
 
 def getSerial():
-  return RS485Ext.RS485Ext(port='/dev/ttyAMA0', baudrate=1200, stopbits=1,
+  return RS485Ext.RS485Ext(port='/dev/ttyAMA0', baudrate=9600, stopbits=1,
                            timeout=1)
 
 client = ModbusSerialClient(method='rtu')
@@ -71,7 +73,7 @@ client.socket = getSerial()
 client.connect()
 
 delay = 0.05
-period = 1.0
+period = 0.5
 
 while True:
   for req in reqs:
@@ -94,6 +96,13 @@ while True:
         if type(result) in [ExceptionResponse, ModbusIOException]:
           raise ModbusException(result)
         print("{0}: {1!s}".format(req.label, result.bits))        
+      elif req.kind == 'I':
+        result = client.read_input_registers(address=req.address,
+                                             count=req.count,
+                                             unit=req.unit)
+        if type(result) in [ExceptionResponse, ModbusIOException]:
+          raise ModbusException(result)
+        print("{0}: {1}".format(req.label, result.registers))        
     except ModbusException as e:
       print("ERROR when querying '{0}': {1!s}".format(req.label, e))
       if client.socket is None:
