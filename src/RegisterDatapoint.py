@@ -170,6 +170,7 @@ def checkRegisterList(registers):
     for r in registers:
         if not isinstance(r, AbstractModbusDatapoint):
             r.errorCount = 0
+            print("Datapoint loaded: {0!s}".format(r))
             raise ValueError('Entry in register list {0!s} is not derived from class AbstractModbusDatapoint'.format(r))        
 
 
