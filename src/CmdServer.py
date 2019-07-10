@@ -216,7 +216,7 @@ class CmdInterpreter(cmd.Cmd):
                 ratio = None
             else:
                 ratio = float(r.errorCount) / float(r.processCount)
-            self.__println("#{0:2d}: {1:10s} ({2:2d}, {3:5d}), pc: {4:7d}, ec: {5:7d}, q: {6:1.4f}"
+            self.__println("#{0:2d}: {1:15s} ({2:2d}, {3:5d}), pc: {4:7d}, ec: {5:7d}, q: {6:1.4f}"
                            .format(i, r.label, r.unit, r.address,
                                    r.processCount, r.errorCount, ratio))
 
