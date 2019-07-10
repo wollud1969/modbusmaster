@@ -232,6 +232,8 @@ class CmdInterpreter(cmd.Cmd):
                 pass
             elif typ == 'T':
                 value = datetime.timedelta(seconds=float(value))
+            elif typ == 'N':
+                value = None
             else:
                 raise CmdInterpreterException('unknown type specifier, must be I, F, B, S or T')
             
@@ -255,6 +257,8 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("                           B .. Boolean")
         self.__println("                           T .. Timedelta, give in seconds")
         self.__println("                           S .. String")
+        self.__println("                           N .. None (Value must be given but is not")
+        self.__println("                                      considered)")
         self.__println("<value>                    New value")
 
 

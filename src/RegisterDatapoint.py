@@ -15,18 +15,17 @@ class AbstractModbusDatapoint(object):
         self.scanRate = scanRate
         self.type = 'abstract data point'
         self.enqueued = False
+        self.lastContact = None
         if self.scanRate:
             self.priority = 1
         else:
             self.priority = 0
 
     def __str__(self):
-        return "{0}, {1}: unit: {2},  address: {3}, count: {4}, scanRate: {5}".format(self.type, 
-                                                                                      self.label, 
-                                                                                      self.unit, 
-                                                                                      self.address, 
-                                                                                      self.count,
-                                                                                      self.scanRate)
+        return ("{0}, {1}: unit: {2},  address: {3}, count: {4}, scanRate: {5}, "
+                "enqueued: {6}, lastContact: {7}"
+                .format(self.type, self.label, self.unit, self.address, self.count,
+                        self.scanRate, self.enqueued, self.lastContact))
 
     def process(self, client):
         raise NotImplementedError
@@ -39,11 +38,13 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
         self.subscribeTopic = subscribeTopic
         self.feedbackTopic = feedbackTopic
         self.writeRequestValue = None
-        self.lastContact = None
         self.type = 'holding register'
 
     def __str__(self):
-        return "[{0!s}, publishTopic: {1}, subscribeTopic: {2}, feedbackTopic: {3}".format(super().__str__(), self.publishTopic, self.subscribeTopic, self.feedbackTopic)
+        return ("[{0!s}, publishTopic: {1}, subscribeTopic: {2}, feedbackTopic: {3}, "
+                "writeRequestValue: {4!s}"
+                .format(super().__str__(), self.publishTopic, self.subscribeTopic, self.feedbackTopic,
+                        self.writeRequestValue))
 
     def process(self, client, pubQueue):
         successFull = True
@@ -61,13 +62,13 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
                     self.writeRequestValue = None
         else:
             # perform read operation
-            # print("Holding register, perform read operation")
+            print("Holding register, perform read operation")
             result = client.read_holding_registers(address=self.address, 
                                                    count=self.count, 
                                                    unit=self.unit)
             if type(result) in [ExceptionResponse, ModbusIOException]:
                 raise DatapointException(result)
-            # print("{0}: {1!s}".format(self.label, result.registers))
+            print("{0}: {1!s}".format(self.label, result.registers))
             pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.registers)))
             if successFull:
                 self.lastContact = datetime.datetime.now()
@@ -89,10 +90,11 @@ class ReadOnlyDatapoint(AbstractModbusDatapoint):
         self.updateOnly = updateOnly
         self.lastValue = None
         self.publishTopic = publishTopic
-        self.lastContact = None
 
     def __str__(self):
-        return "[{0!s}, updateOnly: {1}, publishTopic: {2}".format(super().__str__(), self.updateOnly, self.publishTopic)
+        return ("[{0!s}, updateOnly: {1}, publishTopic: {2}, lastValue: {3!s}"
+                .format(super().__str__(), self.updateOnly, self.publishTopic,
+                        self.lastValue))
 
 
 
@@ -105,7 +107,7 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
         successFull = True
         giveUp = False
         # perform read operation
-        # print("Input register, perform read operation")
+        print("Input register, perform read operation")
         result = client.read_input_registers(address=self.address,
                                              count=self.count,
                                              unit=self.unit)
@@ -113,7 +115,7 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
             raise DatapointException(result)
         if not self.updateOnly or (result.registers != self.lastValue):
             self.lastValue = result.registers
-            # print("{0}: {1!s}".format(self.label, result.registers))        
+            print("{0}: {1!s}".format(self.label, result.registers))        
             pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.registers)))
 
         if successFull:
@@ -136,7 +138,7 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
         successFull = True
         giveUp = False
         # perform read operation
-        # print("Discrete input, perform read operation")
+        print("Discrete input, perform read operation")
         result = client.read_discrete_inputs(address=self.address,
                                              count=self.count,
                                              unit=self.unit)
@@ -144,7 +146,7 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
             raise DatapointException(result)
         if not self.updateOnly or (result.bits != self.lastValue):
             self.lastValue = result.bits
-            # print("{0}: {1!s}".format(self.label, result.bits))        
+            print("{0}: {1!s}".format(self.label, result.bits))        
             pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.bits)))
 
         if successFull:
