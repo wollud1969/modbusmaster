@@ -1,5 +1,4 @@
 import serial
-import serial.serialutil
 import ctypes
 import wiringpi
 import array
@@ -17,7 +16,7 @@ class MyRS485(serial.Serial):
 
     def write(self, b):
         wiringpi.digitalWrite(DE_PIN, wiringpi.HIGH)
-        super.write(b)
+        super().write(b)
         while True:
             fcntl.ioctl(self.fileno(), termios.TIOCSERGETLSR, self.buf, 1)
             if self.buf[0] & termios.TIOCSER_TEMT:
