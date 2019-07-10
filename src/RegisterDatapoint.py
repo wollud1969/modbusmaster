@@ -17,6 +17,7 @@ class AbstractModbusDatapoint(object):
         self.enqueued = False
         self.lastContact = None
         self.errorCount = 0
+        self.processCount = 0
         if self.scanRate:
             self.priority = 1
         else:
@@ -24,10 +25,10 @@ class AbstractModbusDatapoint(object):
 
     def __str__(self):
         return ("{0}, {1}: unit: {2},  address: {3}, count: {4}, scanRate: {5}, "
-                "enqueued: {6}, lastContact: {7}, errorCount: {8}"
+                "enqueued: {6}, lastContact: {7}, errorCount: {8}, processCount: {9}"
                 .format(self.type, self.label, self.unit, self.address, self.count,
                         self.scanRate, self.enqueued, self.lastContact,
-                        self.errorCount))
+                        self.errorCount, self.processCount))
 
     def process(self, client):
         raise NotImplementedError
@@ -65,6 +66,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
         else:
             # perform read operation
             print("Holding register, perform read operation")
+            self.processCount += 1
             result = client.read_holding_registers(address=self.address, 
                                                    count=self.count, 
                                                    unit=self.unit)
@@ -111,6 +113,7 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
         giveUp = False
         # perform read operation
         print("Input register, perform read operation")
+        self.processCount += 1
         result = client.read_input_registers(address=self.address,
                                              count=self.count,
                                              unit=self.unit)
@@ -143,6 +146,7 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
         giveUp = False
         # perform read operation
         print("Discrete input, perform read operation")
+        self.processCount += 1
         result = client.read_discrete_inputs(address=self.address,
                                              count=self.count,
                                              unit=self.unit)
