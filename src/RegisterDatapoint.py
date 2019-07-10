@@ -170,14 +170,17 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
 
 
 
+def resetStatsRegisterList(registers):
+    for r in registers:
+        r.errorCount = 0
+        r.processCount = 0
+        r.enqueued = False
+
 def checkRegisterList(registers):
     for r in registers:
         if not isinstance(r, AbstractModbusDatapoint):
             raise ValueError('Entry in register list {0!s} is not derived from class AbstractModbusDatapoint'.format(r))        
         else:
-            r.errorCount = 0
-            r.processCount = 0
-            r.enqueued = False
             print("Datapoint loaded: {0!s}".format(r))
 
 
