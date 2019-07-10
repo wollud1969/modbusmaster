@@ -4,6 +4,7 @@ import RS485Ext
 import RegisterDatapoint
 from pymodbus.client.sync import ModbusSerialClient
 import wiringpi
+import MyRS485
 
 
 ERROR_PIN = 29
@@ -19,8 +20,10 @@ class CommunicationProcessor(threading.Thread):
         self.daemon = True
 
     def __getSerial(self):
-        return RS485Ext.RS485Ext(port=self.config.serialPort, baudrate=self.config.serialBaudRate, stopbits=1,
-                                 timeout=1)
+        # return RS485Ext.RS485Ext(port=self.config.serialPort, baudrate=self.config.serialBaudRate, stopbits=1,
+        #                         timeout=1)
+        return MyRS485.MyRS485(port=self.config.serialPort, baudrate=self.config.serialBaudRate, stopbits=1,
+                               timeout=1)
 
 
     def run(self):
