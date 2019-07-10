@@ -16,6 +16,7 @@ class AbstractModbusDatapoint(object):
         self.type = 'abstract data point'
         self.enqueued = False
         self.lastContact = None
+        self.errorCount = 0
         if self.scanRate:
             self.priority = 1
         else:
@@ -23,9 +24,10 @@ class AbstractModbusDatapoint(object):
 
     def __str__(self):
         return ("{0}, {1}: unit: {2},  address: {3}, count: {4}, scanRate: {5}, "
-                "enqueued: {6}, lastContact: {7}"
+                "enqueued: {6}, lastContact: {7}, errorCount: {8}"
                 .format(self.type, self.label, self.unit, self.address, self.count,
-                        self.scanRate, self.enqueued, self.lastContact))
+                        self.scanRate, self.enqueued, self.lastContact,
+                        self.errorCount))
 
     def process(self, client):
         raise NotImplementedError
@@ -67,6 +69,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
                                                    count=self.count, 
                                                    unit=self.unit)
             if type(result) in [ExceptionResponse, ModbusIOException]:
+                self.errorCount += 1
                 raise DatapointException(result)
             print("{0}: {1!s}".format(self.label, result.registers))
             pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.registers)))
@@ -112,6 +115,7 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
                                              count=self.count,
                                              unit=self.unit)
         if type(result) in [ExceptionResponse, ModbusIOException]:
+            self.errorCount += 1
             raise DatapointException(result)
         if not self.updateOnly or (result.registers != self.lastValue):
             self.lastValue = result.registers
@@ -143,6 +147,7 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
                                              count=self.count,
                                              unit=self.unit)
         if type(result) in [ExceptionResponse, ModbusIOException]:
+            self.errorCount += 1
             raise DatapointException(result)
         if not self.updateOnly or (result.bits != self.lastValue):
             self.lastValue = result.bits
@@ -164,6 +169,7 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
 def checkRegisterList(registers):
     for r in registers:
         if not isinstance(r, AbstractModbusDatapoint):
+            r.errorCount = 0
             raise ValueError('Entry in register list {0!s} is not derived from class AbstractModbusDatapoint'.format(r))        
 
 
