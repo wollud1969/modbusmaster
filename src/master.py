@@ -21,8 +21,7 @@ if __name__ == "__main__":
     datapoints = None
     with open(config.registerFile, 'rb') as f:
         datapoints = pickle.load(f)
-    RegisterDatapoint.checkRegisterList(datapoints)
-    RegisterDatapoint.resetStatsRegisterList(datapoints)
+    RegisterDatapoint.checkRegisterList(datapoints, reset=True)
 
     cp = CommunicationProcessor.CommunicationProcessor(config, queue, pubQueue)
     cp.start()
