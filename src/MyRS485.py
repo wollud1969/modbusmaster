@@ -1,5 +1,4 @@
 import serial
-import ctypes
 import wiringpi
 import array
 import fcntl
