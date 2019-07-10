@@ -1,6 +1,6 @@
 import threading
 import datetime
-import RS485Ext
+# import RS485Ext
 import RegisterDatapoint
 from pymodbus.client.sync import ModbusSerialClient
 import wiringpi
