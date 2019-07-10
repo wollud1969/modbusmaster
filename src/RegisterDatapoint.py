@@ -177,6 +177,7 @@ def checkRegisterList(registers):
         else:
             r.errorCount = 0
             r.processCount = 0
+            r.enqueued = False
             print("Datapoint loaded: {0!s}".format(r))
 
 
