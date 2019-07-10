@@ -210,6 +210,22 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("-----------")
         self.__println("List the configured datapoints")
 
+    def do_stats(self, arg):
+        for i, r in enumerate(self.registers):
+            if r.processCount == 0:
+                ratio = None
+            else:
+                ratio = float(r.errorCount) / float(r.processCount)
+            self.__println("#{0}: {1}, processCount: {2}, errorCount: {3}, ratio: {4}"
+                           .format(i, r.label, r.processCount, r.errorCount, ratio))
+
+    def help_stats(self):
+        self.__println("Usage: stats")
+        self.__println("-----------")
+        self.__println("List the statistics of configured datapoints")
+
+
+
     def do_change(self, arg):
         (idx, key, typ, value) = self.splitterRe.split(arg)
         try:
