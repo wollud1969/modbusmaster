@@ -50,19 +50,10 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
                         self.writeRequestValue))
 
     def process(self, client, pubQueue):
-        successFull = True
-        giveUp = False
         if self.writeRequestValue:
             # perform write operation
             print("Holding register, perform write operation")
-            if successFull:
-                # give feedback
-                self.writeRequestValue = None
-            else:
-                # retries handling
-                if giveUp:
-                    # give negative feedback
-                    self.writeRequestValue = None
+            self.writeRequestValue = None
         else:
             # perform read operation
             print("Holding register, perform read operation")
@@ -75,15 +66,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
                 raise DatapointException(result)
             print("{0}: {1!s}".format(self.label, result.registers))
             pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.registers)))
-            if successFull:
-                self.lastContact = datetime.datetime.now()
-                # publish value
-            else:
-                # retries handling
-                if giveUp:
-                    # backoff and availability handling
-                    # give negative feedback
-                    pass
+            self.lastContact = datetime.datetime.now()
     
     def onMessage(self, value):
         self.writeRequestValue = value
@@ -109,8 +92,6 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
         self.type = 'input register'
 
     def process(self, client, pubQueue):
-        successFull = True
-        giveUp = False
         # perform read operation
         print("Input register, perform read operation")
         self.processCount += 1
@@ -124,16 +105,7 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
             self.lastValue = result.registers
             print("{0}: {1!s}".format(self.label, result.registers))        
             pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.registers)))
-
-        if successFull:
-            self.lastContact = datetime.datetime.now()
-            # publish value
-        else:
-            # retries handling
-            if giveUp:
-                # backoff and availability handling
-                # give negative feedback
-                pass
+        self.lastContact = datetime.datetime.now()
 
 
 class DiscreteInputDatapoint(ReadOnlyDatapoint):
@@ -142,8 +114,6 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
         self.type = 'discrete input'
 
     def process(self, client, pubQueue):
-        successFull = True
-        giveUp = False
         # perform read operation
         print("Discrete input, perform read operation")
         self.processCount += 1
@@ -157,18 +127,7 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
             self.lastValue = result.bits
             print("{0}: {1!s}".format(self.label, result.bits))        
             pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.bits)))
-
-        if successFull:
-            self.lastContact = datetime.datetime.now()
-            # publish value
-        else:
-            # retries handling
-            if giveUp:
-                # backoff and availability handling
-                # give negative feedback
-                pass
-
-
+        self.lastContact = datetime.datetime.now()
 
 
 def checkRegisterList(registers, reset=False):
