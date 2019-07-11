@@ -10,4 +10,4 @@ class Config(object):
         self.registerFile = 'registers.pkl'
         self.serialPort = '/dev/ttyAMA0'
         self.serialBaudRate = 9600
-
+        self.interCommDelay = 0.025

@@ -210,10 +210,20 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("-----------")
         self.__println("List the configured datapoints")
 
+    def do_reset(self, arg):
+        for r in self.registers:
+            r.errorCount = 0
+            r.processCount = 0
+    
+    def help_reset(self):
+        self.__println("Usage: reset")
+        self.__println("-----------")
+        self.__println("Resets the statistics of configured datapoints")
+
     def do_stats(self, arg):
         for i, r in enumerate(self.registers):
             if r.processCount == 0:
-                ratio = None
+                ratio = -1
             else:
                 ratio = float(r.errorCount) / float(r.processCount)
             self.__println("#{0:2d}: {1:15s} ({2:2d}, {3:5d}), pc: {4:7d}, ec: {5:7d}, q: {6:1.4f}"

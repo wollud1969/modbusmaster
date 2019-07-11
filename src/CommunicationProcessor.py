@@ -5,6 +5,7 @@ import RegisterDatapoint
 from pymodbus.client.sync import ModbusSerialClient
 import wiringpi
 import MyRS485
+import time
 
 
 ERROR_PIN = 29
@@ -44,6 +45,9 @@ class CommunicationProcessor(threading.Thread):
                 if client.socket is None:
                     print("renew socket")
                     client.socket = self.__getSerial()
+            finally:
+                time.sleep(self.config.interCommDelay)
+
 
 
 
