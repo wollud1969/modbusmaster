@@ -3,6 +3,7 @@ from pymodbus.pdu import ExceptionResponse
 from pymodbus.exceptions import ModbusIOException
 import MqttProcessor
 import logging
+import pickle
 
 
 class DatapointException(Exception): pass
@@ -142,7 +143,7 @@ def loadRegisterList(registerList):
     with open(registerList, 'rb') as f:
         datapoints = pickle.load(f)
 
-    RegisterDatapoint.checkRegisterList(datapoints, reset=True)
+    checkRegisterList(datapoints)
 
     newDatapoints = []
     for dp in datapoints:
@@ -152,10 +153,12 @@ def loadRegisterList(registerList):
         newDatapoints.append(ndp)
         logging.getLogger('loadRegisterList').debug("Datapoint loaded: {0!s}".format(ndp))
 
-    RegisterDatapoint.checkRegisterList(newDatapoints, reset=True)
+    checkRegisterList(newDatapoints, reset=True)
 
     with open(registerList, 'wb') as f:
         pickle.dump(newDatapoints, f)
+
+    return newDatapoints
 
 
 def checkRegisterList(registers, reset=False):
