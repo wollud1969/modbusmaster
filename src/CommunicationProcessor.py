@@ -21,7 +21,7 @@ class CommunicationProcessor(threading.Thread):
         wiringpi.pinMode(ERROR_PIN, wiringpi.OUTPUT)
         self.daemon = True
         logging.getLogger('pymodbus').setLevel(logging.ERROR)
-
+        self.logger = logging.getLogger('CommunicationProcessor')
 
     def __getSerial(self):
         # return RS485Ext.RS485Ext(port=self.config.serialPort, baudrate=self.config.serialBaudRate, stopbits=1,
@@ -39,14 +39,14 @@ class CommunicationProcessor(threading.Thread):
             r = self.queue.get()
             try:
                 wiringpi.digitalWrite(ERROR_PIN, wiringpi.LOW)
-                print("Dequeued: {0!s}".format(r))
+                self.logger.debug("Dequeued: {0!s}".format(r))
                 r.enqueued = False
                 r.process(client, self.pubQueue)
             except RegisterDatapoint.DatapointException as e:
                 wiringpi.digitalWrite(ERROR_PIN, wiringpi.HIGH)
-                print("ERROR when processing '{0}': {1!s}".format(r.label, e))
+                self.logger.error("ERROR when processing '{0}': {1!s}".format(r.label, e))
                 if client.socket is None:
-                    print("renew socket")
+                    self.logger.error("renew socket")
                     client.socket = self.__getSerial()
             finally:
                 time.sleep(self.config.interCommDelay)

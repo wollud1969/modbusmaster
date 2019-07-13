@@ -1,7 +1,7 @@
 import threading
 import datetime
 from NotificationForwarder import AbstractNotificationReceiver
-
+import logging
 
 class ScanRateConsideringQueueFeeder(threading.Thread, AbstractNotificationReceiver):
     def __init__(self, config, registers, queue):
@@ -11,12 +11,13 @@ class ScanRateConsideringQueueFeeder(threading.Thread, AbstractNotificationRecei
         self.queue = queue
         self.delayEvent = threading.Event()
         self.daemon = True
+        self.logger = logging.getLogger('ScanRateConsideringQueueFeeder')
 
     def getMinimalScanrate(self):
             return min([r.scanRate.total_seconds() for r in self.registers if r.scanRate])
 
     def receiveNotification(self, arg):
-        print("ScanRateConsideringQueueFeeder:registersChanged")
+        self.logger.info("ScanRateConsideringQueueFeeder:registersChanged")
         self.delay = self.getMinimalScanrate()
 
     def run(self):

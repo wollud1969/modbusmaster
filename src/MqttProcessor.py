@@ -1,7 +1,7 @@
 import threading
 import paho.mqtt.client as mqtt
 from NotificationForwarder import AbstractNotificationReceiver
-
+import logging
 
 
 class PublishItem(object):
@@ -29,33 +29,33 @@ class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
         self.subscriptions = []
         self.topicRegisterMap ={}
         self.daemon = True
+        self.logger = logging.getLogger('MqttProcessor')
 
     def __processUpdatedRegisters(self, force=False):
-        # print("MqttProcessor.__updateSubscriptions")
+        self.logger.debug("MqttProcessor.__updateSubscriptions")
 
         subscribeTopics = [ r.subscribeTopic for r in self.registers if r.subscribeTopic]
-        # print("Topics: {0!s}".format(subscribeTopics))
+        self.logger.debug("Topics: {0!s}".format(subscribeTopics))
 
         for subscribeTopic in subscribeTopics:
             if (subscribeTopic not in self.subscriptions) or force:
-                print("Subscribe to {0}".format(subscribeTopic))
+                self.logger.debug("Subscribe to {0}".format(subscribeTopic))
                 self.client.subscribe(subscribeTopic)
                 self.subscriptions.append(subscribeTopic)
 
         for subscription in self.subscriptions:
             if (subscription not in subscribeTopics) and not force:
-                print("Unsubscribe from {0}".format(subscription))
+                self.logger.debug("Unsubscribe from {0}".format(subscription))
                 self.client.unsubscribe(subscription)
                 self.subscriptions.remove(subscription)
 
         self.topicRegisterMap = { r.subscribeTopic: r for r in self.registers if r.subscribeTopic }
 
     def receiveNotification(self, arg):
-        print("MqttProcessor:registersChanged")
+        self.logger.info("MqttProcessor:registersChanged")
         self.__processUpdatedRegisters()
 
     def run(self):
-        # print("MqttProcessor.run")
         self.client.on_message = mqttOnMessageCallback
         self.client.on_connect = mqttOnConnectCallback
         self.client.on_disconnect = mqttOnDisconnectCallback
@@ -69,7 +69,7 @@ class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
             if isinstance(pubItem, PublishItem):
                 self.client.publish(pubItem.topic, pubItem.payload)
             else:
-                print("Invalid object in publish queue")
+                self.logger.error("Invalid object in publish queue")
 
 
     def onConnect(self):
@@ -77,14 +77,12 @@ class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
         self.__processUpdatedRegisters(force=True)
 
     def onDisconnect(self, rc):
-        print("Disconnected from MQTT broker: {0}".format(rc))
+        self.logger.error("Disconnected from MQTT broker: {0}".format(rc))
 
     def onMessage(self, topic, payload):
         # print("MqttProcessor.onMessage")
         r = self.topicRegisterMap[topic]
-        # print("{0}: {1!s} -> {2!s}".format(topic, payload, r))
+        self.logger.debug("{0}: {1!s} -> {2!s}".format(topic, payload, r))
         r.onMessage(payload)
         self.queue.put(r)
-
-
 
