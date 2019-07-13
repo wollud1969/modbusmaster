@@ -1,7 +1,6 @@
 
 class Config(object):
     def __init__(self):
-        self.appName = 'mbm'
         self.logFile = '/tmp/mbm.log'
         self.mqttBrokerHost = '172.16.2.16'
         self.mqttBrokerPort = 1883
