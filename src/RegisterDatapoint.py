@@ -8,7 +8,7 @@ import logging
 class DatapointException(Exception): pass
 
 class AbstractModbusDatapoint(object):
-    def __init__(self, label, unit, address, count, scanRate):
+    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None):
         self.label = label
         self.unit = unit
         self.address = address
@@ -36,7 +36,8 @@ class AbstractModbusDatapoint(object):
 
 
 class HoldingRegisterDatapoint(AbstractModbusDatapoint):
-    def __init__(self, label, unit, address, count, scanRate, publishTopic, subscribeTopic, feedbackTopic):
+    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, 
+                 publishTopic=None, subscribeTopic=None, feedbackTopic=None):
         super().__init__(label, unit, address, count, scanRate)
         self.publishTopic = publishTopic
         self.subscribeTopic = subscribeTopic
@@ -75,7 +76,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
 
 
 class ReadOnlyDatapoint(AbstractModbusDatapoint):
-    def __init__(self, label, unit, address, count, scanRate, updateOnly, publishTopic):
+    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, publishTopic=None):
         super().__init__(label, unit, address, count, scanRate)
         self.updateOnly = updateOnly
         self.lastValue = None
@@ -89,7 +90,7 @@ class ReadOnlyDatapoint(AbstractModbusDatapoint):
 
 
 class InputRegisterDatapoint(ReadOnlyDatapoint):
-    def __init__(self, label, unit, address, count, scanRate, updateOnly, publishTopic):
+    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, publishTopic=None):
         super().__init__(label, unit, address, count, scanRate, updateOnly, publishTopic)
         self.type = 'input register'
         self.logger = logging.getLogger('InputRegisterDatapoint')
@@ -112,7 +113,7 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
 
 
 class DiscreteInputDatapoint(ReadOnlyDatapoint):
-    def __init__(self, label, unit, address, count, scanRate, updateOnly, publishTopic):
+    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, publishTopic=None):
         super().__init__(label, unit, address, count, scanRate, updateOnly, publishTopic)
         self.type = 'discrete input'
         self.logger = logging.getLogger('DiscreteInputDatapoint')
