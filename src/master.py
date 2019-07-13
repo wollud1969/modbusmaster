@@ -35,10 +35,7 @@ if __name__ == "__main__":
     logger.debug('infrastructure prepared')
 
 
-    datapoints = None
-    with open(config.registerFile, 'rb') as f:
-        datapoints = pickle.load(f)
-    RegisterDatapoint.checkRegisterList(datapoints, reset=True)
+    datapoints = RegisterDatapoint.loadRegisterList(config.registerFile)
     logger.debug('datapoints read')
 
     cp = CommunicationProcessor.CommunicationProcessor(config, queue, pubQueue)
