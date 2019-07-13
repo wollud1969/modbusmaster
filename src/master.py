@@ -17,7 +17,7 @@ import logging
 if __name__ == "__main__":
     config = Config.Config()
 
-    logger = logging.getLogger(config.appName)
+    logger = logging.getLogger()
     logger.setLevel(logging.DEBUG)
     fh = logging.FileHandler(config.logFile)
     fh.setLevel(logging.DEBUG)

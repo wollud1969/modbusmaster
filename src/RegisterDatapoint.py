@@ -4,7 +4,6 @@ from pymodbus.exceptions import ModbusIOException
 import MqttProcessor
 import logging
 
-logger = logging.getLogger()
 
 class DatapointException(Exception): pass
 
@@ -44,6 +43,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
         self.feedbackTopic = feedbackTopic
         self.writeRequestValue = None
         self.type = 'holding register'
+        self.logger = logging.getLogger('HoldingRegisterDatapoint')
 
     def __str__(self):
         return ("[{0!s}, publishTopic: {1}, subscribeTopic: {2}, feedbackTopic: {3}, "
@@ -54,11 +54,11 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
     def process(self, client, pubQueue):
         if self.writeRequestValue:
             # perform write operation
-            print("Holding register, perform write operation")
+            self.logger.debug("Holding register, perform write operation")
             self.writeRequestValue = None
         else:
             # perform read operation
-            print("Holding register, perform read operation")
+            self.logger.debug("Holding register, perform read operation")
             self.processCount += 1
             result = client.read_holding_registers(address=self.address, 
                                                    count=self.count, 
@@ -66,7 +66,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
             if type(result) in [ExceptionResponse, ModbusIOException]:
                 self.errorCount += 1
                 raise DatapointException(result)
-            print("{0}: {1!s}".format(self.label, result.registers))
+            self.logger.debug("{0}: {1!s}".format(self.label, result.registers))
             pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.registers)))
             self.lastContact = datetime.datetime.now()
     
@@ -92,10 +92,11 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
     def __init__(self, label, unit, address, count, scanRate, updateOnly, publishTopic):
         super().__init__(label, unit, address, count, scanRate, updateOnly, publishTopic)
         self.type = 'input register'
+        self.logger = logging.getLogger('InputRegisterDatapoint')
 
     def process(self, client, pubQueue):
         # perform read operation
-        print("Input register, perform read operation")
+        self.logger.debug("Input register, perform read operation")
         self.processCount += 1
         result = client.read_input_registers(address=self.address,
                                              count=self.count,
@@ -105,7 +106,7 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
             raise DatapointException(result)
         if not self.updateOnly or (result.registers != self.lastValue):
             self.lastValue = result.registers
-            print("{0}: {1!s}".format(self.label, result.registers))        
+            self.logger.debug("{0}: {1!s}".format(self.label, result.registers))        
             pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.registers)))
         self.lastContact = datetime.datetime.now()
 
@@ -114,10 +115,11 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
     def __init__(self, label, unit, address, count, scanRate, updateOnly, publishTopic):
         super().__init__(label, unit, address, count, scanRate, updateOnly, publishTopic)
         self.type = 'discrete input'
+        self.logger = logging.getLogger('DiscreteInputDatapoint')
 
     def process(self, client, pubQueue):
         # perform read operation
-        print("Discrete input, perform read operation")
+        self.logger.debug("Discrete input, perform read operation")
         self.processCount += 1
         result = client.read_discrete_inputs(address=self.address,
                                              count=self.count,
@@ -127,7 +129,7 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
             raise DatapointException(result)
         if not self.updateOnly or (result.bits != self.lastValue):
             self.lastValue = result.bits
-            print("{0}: {1!s}".format(self.label, result.bits))        
+            self.logger.debug("{0}: {1!s}".format(self.label, result.bits))        
             pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.bits)))
         self.lastContact = datetime.datetime.now()
 
@@ -141,7 +143,7 @@ def checkRegisterList(registers, reset=False):
                 r.errorCount = 0
                 r.processCount = 0
                 r.enqueued = False
-            logger.debug("Datapoint loaded: {0!s}".format(r))
+            logging.getLogger('checkRegisterList').debug("Datapoint loaded: {0!s}".format(r))
 
 
 
