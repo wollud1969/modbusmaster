@@ -2,7 +2,9 @@ import datetime
 from pymodbus.pdu import ExceptionResponse
 from pymodbus.exceptions import ModbusIOException
 import MqttProcessor
+import logging
 
+logger = logging.getLogger()
 
 class DatapointException(Exception): pass
 
@@ -139,7 +141,7 @@ def checkRegisterList(registers, reset=False):
                 r.errorCount = 0
                 r.processCount = 0
                 r.enqueued = False
-            print("Datapoint loaded: {0!s}".format(r))
+            logger.debug("Datapoint loaded: {0!s}".format(r))
 
 
 
