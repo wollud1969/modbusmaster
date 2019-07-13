@@ -44,7 +44,6 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
         self.feedbackTopic = feedbackTopic
         self.writeRequestValue = None
         self.type = 'holding register'
-        self.logger = logging.getLogger('HoldingRegisterDatapoint')
 
     def __str__(self):
         return ("[{0!s}, publishTopic: {1}, subscribeTopic: {2}, feedbackTopic: {3}, "
@@ -53,6 +52,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
                         self.writeRequestValue))
 
     def process(self, client, pubQueue):
+        self.logger = logging.getLogger('HoldingRegisterDatapoint')
         if self.writeRequestValue:
             # perform write operation
             self.logger.debug("Holding register, perform write operation")
@@ -93,9 +93,9 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
     def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, publishTopic=None):
         super().__init__(label, unit, address, count, scanRate, updateOnly, publishTopic)
         self.type = 'input register'
-        self.logger = logging.getLogger('InputRegisterDatapoint')
 
     def process(self, client, pubQueue):
+        self.logger = logging.getLogger('InputRegisterDatapoint')
         # perform read operation
         self.logger.debug("Input register, perform read operation")
         self.processCount += 1
@@ -116,9 +116,9 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
     def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, publishTopic=None):
         super().__init__(label, unit, address, count, scanRate, updateOnly, publishTopic)
         self.type = 'discrete input'
-        self.logger = logging.getLogger('DiscreteInputDatapoint')
 
     def process(self, client, pubQueue):
+        self.logger = logging.getLogger('DiscreteInputDatapoint')
         # perform read operation
         self.logger.debug("Discrete input, perform read operation")
         self.processCount += 1

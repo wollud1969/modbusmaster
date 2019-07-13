@@ -6,6 +6,7 @@ from pymodbus.client.sync import ModbusSerialClient
 import wiringpi
 import MyRS485
 import time
+import logging
 
 
 ERROR_PIN = 29
@@ -19,6 +20,8 @@ class CommunicationProcessor(threading.Thread):
         wiringpi.wiringPiSetup()
         wiringpi.pinMode(ERROR_PIN, wiringpi.OUTPUT)
         self.daemon = True
+        logging.getLogger('pymodbus').setLevel(logging.ERROR)
+
 
     def __getSerial(self):
         # return RS485Ext.RS485Ext(port=self.config.serialPort, baudrate=self.config.serialBaudRate, stopbits=1,
