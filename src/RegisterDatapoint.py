@@ -138,7 +138,7 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
 
 def loadRegisterList(registerList):
     # Load, check and auto-update registers file
-    
+
     with open(registerList, 'rb') as f:
         datapoints = pickle.load(f)
 
@@ -150,6 +150,7 @@ def loadRegisterList(registerList):
         for k,v in dp.__dict__.items():
             ndp.__dict__[k] = v
         newDatapoints.append(ndp)
+        logging.getLogger('loadRegisterList').debug("Datapoint loaded: {0!s}".format(ndp))
 
     RegisterDatapoint.checkRegisterList(newDatapoints, reset=True)
 
@@ -166,7 +167,6 @@ def checkRegisterList(registers, reset=False):
                 r.errorCount = 0
                 r.processCount = 0
                 r.enqueued = False
-            logging.getLogger('checkRegisterList').debug("Datapoint loaded: {0!s}".format(r))
 
 
 
