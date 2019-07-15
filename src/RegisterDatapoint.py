@@ -53,14 +53,14 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
                         self.writeRequestValue))
 
     def process(self, client, pubQueue):
-        self.logger = logging.getLogger('HoldingRegisterDatapoint')
+        logger = logging.getLogger('HoldingRegisterDatapoint')
         if self.writeRequestValue:
             # perform write operation
-            self.logger.debug("Holding register, perform write operation")
+            logger.debug("Holding register, perform write operation")
             self.writeRequestValue = None
         else:
             # perform read operation
-            self.logger.debug("Holding register, perform read operation")
+            logger.debug("Holding register, perform read operation")
             self.processCount += 1
             result = client.read_holding_registers(address=self.address, 
                                                    count=self.count, 
@@ -68,7 +68,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
             if type(result) in [ExceptionResponse, ModbusIOException]:
                 self.errorCount += 1
                 raise DatapointException(result)
-            self.logger.debug("{0}: {1!s}".format(self.label, result.registers))
+            logger.debug("{0}: {1!s}".format(self.label, result.registers))
             pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.registers)))
             self.lastContact = datetime.datetime.now()
     
@@ -96,9 +96,9 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
         self.type = 'input register'
 
     def process(self, client, pubQueue):
-        self.logger = logging.getLogger('InputRegisterDatapoint')
+        logger = logging.getLogger('InputRegisterDatapoint')
         # perform read operation
-        self.logger.debug("Input register, perform read operation")
+        logger.debug("Input register, perform read operation")
         self.processCount += 1
         result = client.read_input_registers(address=self.address,
                                              count=self.count,
@@ -108,7 +108,7 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
             raise DatapointException(result)
         if not self.updateOnly or (result.registers != self.lastValue):
             self.lastValue = result.registers
-            self.logger.debug("{0}: {1!s}".format(self.label, result.registers))        
+            logger.debug("{0}: {1!s}".format(self.label, result.registers))        
             pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.registers)))
         self.lastContact = datetime.datetime.now()
 
@@ -119,9 +119,9 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
         self.type = 'discrete input'
 
     def process(self, client, pubQueue):
-        self.logger = logging.getLogger('DiscreteInputDatapoint')
+        logger = logging.getLogger('DiscreteInputDatapoint')
         # perform read operation
-        self.logger.debug("Discrete input, perform read operation")
+        logger.debug("Discrete input, perform read operation")
         self.processCount += 1
         result = client.read_discrete_inputs(address=self.address,
                                              count=self.count,
@@ -131,7 +131,7 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
             raise DatapointException(result)
         if not self.updateOnly or (result.bits != self.lastValue):
             self.lastValue = result.bits
-            self.logger.debug("{0}: {1!s}".format(self.label, result.bits))        
+            logger.debug("{0}: {1!s}".format(self.label, result.bits))        
             pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.bits)))
         self.lastContact = datetime.datetime.now()
 
