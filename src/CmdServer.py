@@ -309,7 +309,8 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("DO NOT FORGET TO SAVE AFTERWARDS!")
 
     def do_save(self, arg):
-        self.logger.warn(str(self.registers))
+        for i in self.registers:
+            self.logger.warn("{0!s}: {1!s}".format(i, i.__dict__))
         with open(self.config.registerFile, 'wb') as f:
             pickle.dump(self.registers, f)
 
