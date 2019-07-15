@@ -20,7 +20,10 @@ class CommunicationProcessor(threading.Thread):
         wiringpi.wiringPiSetup()
         wiringpi.pinMode(ERROR_PIN, wiringpi.OUTPUT)
         self.daemon = True
-        logging.getLogger('pymodbus').setLevel(logging.ERROR)
+        if self.config.modbusDebug:
+            logging.getLogger('pymodbus').setLevel(logging.DEBUG)
+        else:
+            logging.getLogger('pymodbus').setLevel(logging.ERROR)
         self.logger = logging.getLogger('CommunicationProcessor')
 
     def __getSerial(self):

@@ -2,6 +2,7 @@
 class Config(object):
     def __init__(self):
         self.logFile = '/tmp/mbm.log'
+        self.modbusDebug = False
         self.mqttBrokerHost = '172.16.2.16'
         self.mqttBrokerPort = 1883
         self.mqttLogin = ''
