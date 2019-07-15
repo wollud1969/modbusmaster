@@ -7,6 +7,7 @@ import datetime
 import pickle
 import sys
 import RegisterDatapoint
+import logging
 
 class CmdInterpreterException(ValueError): pass
 
@@ -30,6 +31,7 @@ class CmdInterpreter(cmd.Cmd):
         self.prompt = "test8> "
         self.intro = "test8 admin interface"
         self.splitterRe = re.compile('\s+')
+        self.logger = logging.getLogger('CmdInterpreter')
 
     def __print(self, text):
         self.stdout.write(text)
@@ -307,7 +309,7 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("DO NOT FORGET TO SAVE AFTERWARDS!")
 
     def do_save(self, arg):
-        self.__println(str(self.registers))
+        self.logger.warn(str(self.registers))
         with open(self.config.registerFile, 'wb') as f:
             pickle.dump(self.registers, f)
 
@@ -340,13 +342,14 @@ class CmdInterpreter(cmd.Cmd):
 
 class CmdHandle(socketserver.StreamRequestHandler):
     def handle(self):
+        logger = logging.getLogger('CmdHandle')
         cmd = CmdInterpreter(io.TextIOWrapper(self.rfile), io.TextIOWrapper(self.wfile), self.server.userData.config, 
                              self.server.userData.notifier, self.server.userData.registers)
         try:
             cmd.cmdloop()
-            print("Cmd handle terminated")
+            logger.info("Cmd handle terminated")
         except ConnectionAbortedError as e:
-            print("Cmd handle externally interrupted")
+            logger.info("Cmd handle externally interrupted")
 
 class MyThreadingTCPServer(socketserver.ThreadingTCPServer):
     def __init__(self, host, handler, userData):
