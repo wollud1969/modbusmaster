@@ -13,7 +13,8 @@ newDatapoints = []
 for dp in datapoints:
     ndp = type(dp)()
     for k,v in dp.__dict__.items():
-        ndp.__dict__[k] = v
+        if k != 'logger':
+            ndp.__dict__[k] = v
     newDatapoints.append(ndp)
 
 RegisterDatapoint.checkRegisterList(newDatapoints, reset=True)

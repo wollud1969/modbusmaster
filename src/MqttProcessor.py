@@ -34,7 +34,7 @@ class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
     def __processUpdatedRegisters(self, force=False):
         self.logger.debug("MqttProcessor.__updateSubscriptions")
 
-        subscribeTopics = [ r.subscribeTopic for r in self.registers if r.subscribeTopic]
+        subscribeTopics = [ r.subscribeTopic for r in self.registers if hasattr(r,'subscribeTopic') and r.subscribeTopic]
         self.logger.debug("Topics: {0!s}".format(subscribeTopics))
 
         for subscribeTopic in subscribeTopics:
@@ -49,7 +49,7 @@ class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
                 self.client.unsubscribe(subscription)
                 self.subscriptions.remove(subscription)
 
-        self.topicRegisterMap = { r.subscribeTopic: r for r in self.registers if r.subscribeTopic }
+        self.topicRegisterMap = { r.subscribeTopic: r for r in self.registers if hasattr(r,'subscribeTopic') and r.subscribeTopic }
 
     def receiveNotification(self, arg):
         self.logger.info("MqttProcessor:registersChanged")
