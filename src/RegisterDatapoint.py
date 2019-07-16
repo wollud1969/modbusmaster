@@ -6,28 +6,6 @@ import logging
 import json
 
 
-class JsonifyEncoder(json.JSONEncoder):
-    def default(self, o):
-        res = None
-        try:
-            res = o.jsonify()
-        except (TypeError, AttributeError):
-            if type(o) == datetime.timedelta:
-                res = o.total_seconds()
-            else:
-                res = super().default(o)
-        return res
-
-def datapointObjectHook(j):
-    if type(j) == dict and 'type' in j and 'args' in j:
-        klass = eval(j['type'])
-        o = klass(**j['args'])
-        return o
-    else:
-        return j
-
-
-
 class DatapointException(Exception): pass
 
 class AbstractModbusDatapoint(object):
@@ -170,6 +148,27 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
         self.lastContact = datetime.datetime.now()
 
 
+
+
+class JsonifyEncoder(json.JSONEncoder):
+    def default(self, o):
+        res = None
+        try:
+            res = o.jsonify()
+        except (TypeError, AttributeError):
+            if type(o) == datetime.timedelta:
+                res = o.total_seconds()
+            else:
+                res = super().default(o)
+        return res
+
+def datapointObjectHook(j):
+    if type(j) == dict and 'type' in j and 'args' in j:
+        klass = eval(j['type'])
+        o = klass(**j['args'])
+        return o
+    else:
+        return j
 
 def saveRegisterList(registerList, registerListFile):
     js = json.dumps(registerList, cls=JsonifyEncoder, sort_keys=True, indent=4)
