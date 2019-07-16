@@ -9,7 +9,7 @@ class Config(object):
         self.mqttPassword = ''
         self.cmdAddress = '127.0.0.1'
         self.cmdPort = 9999
-        self.registerFile = 'registers.pkl'
+        self.registerFile = 'registers.json'
         self.serialPort = '/dev/ttyAMA0'
         self.serialBaudRate = 9600
         self.interCommDelay = 0.025

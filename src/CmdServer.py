@@ -309,7 +309,7 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("DO NOT FORGET TO SAVE AFTERWARDS!")
 
     def do_save(self, arg):
-        RegisterDatapoint.saveRegisterFile(self.registers, self.config.registerFile)
+        RegisterDatapoint.saveRegisterList(self.registers, self.config.registerFile)
 
     def help_save(self):
         self.__println("Usage: save")
