@@ -4,8 +4,6 @@ import cmd
 import re
 import io
 import datetime
-import pickle
-import sys
 import RegisterDatapoint
 import logging
 
@@ -325,13 +323,6 @@ class CmdInterpreter(cmd.Cmd):
     def help_load(self):
         self.__println("Usage: load")
         self.__println("Reload the register file, overwrite all unsaved changes.")
-
-    #def do_shutdown(self, arg):
-    #    sys.exit()
-
-    #def help_shutdown(self):
-    #    self.__println("Usage: shutdown")
-    #    self.__println("Shuts down the application")
 
 
 

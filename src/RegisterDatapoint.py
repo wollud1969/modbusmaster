@@ -4,7 +4,6 @@ from pymodbus.exceptions import ModbusIOException
 import MqttProcessor
 import logging
 import json
-import pickle
 
 
 class JsonifyEncoder(json.JSONEncoder):
