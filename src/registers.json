@@ -42,7 +42,7 @@
             "feedbackTopic": null,
             "label": "Counter1",
             "publishTopic": "Pub/Counter1",
-            "scanRate": 60.0,
+            "scanRate": 1.0,
             "subscribeTopic": null,
             "unit": 4
         },
@@ -55,7 +55,7 @@
             "feedbackTopic": null,
             "label": "Counter2",
             "publishTopic": "Pub/Counter2",
-            "scanRate": 60.0,
+            "scanRate": 1.0,
             "subscribeTopic": null,
             "unit": 4
         },
@@ -68,7 +68,7 @@
             "feedbackTopic": null,
             "label": "Counter3",
             "publishTopic": "Pub/Counter3",
-            "scanRate": 60.0,
+            "scanRate": 1.0,
             "subscribeTopic": null,
             "unit": 4
         },
@@ -81,7 +81,7 @@
             "feedbackTopic": null,
             "label": "Counter4",
             "publishTopic": "Pub/Counter4",
-            "scanRate": 60.0,
+            "scanRate": 1.0,
             "subscribeTopic": null,
             "unit": 4
         },
