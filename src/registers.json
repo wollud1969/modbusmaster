@@ -1,0 +1,129 @@
+[
+    {
+        "args": {
+            "address": 1,
+            "count": 1,
+            "label": "Temperature",
+            "publishTopic": "Pub/Temperature",
+            "scanRate": 60.0,
+            "unit": 5,
+            "updateOnly": false
+        },
+        "type": "InputRegisterDatapoint"
+    },
+    {
+        "args": {
+            "address": 2,
+            "count": 1,
+            "label": "Humidity",
+            "publishTopic": "Pub/Humidity",
+            "scanRate": null,
+            "unit": 5,
+            "updateOnly": false
+        },
+        "type": "InputRegisterDatapoint"
+    },
+    {
+        "args": {
+            "address": 0,
+            "count": 1,
+            "label": "Switches",
+            "publishTopic": "Pub/Switches",
+            "scanRate": 60.0,
+            "unit": 4,
+            "updateOnly": false
+        },
+        "type": "DiscreteInputDatapoint"
+    },
+    {
+        "args": {
+            "address": 40010,
+            "count": 2,
+            "feedbackTopic": null,
+            "label": "Counter1",
+            "publishTopic": "Pub/Counter1",
+            "scanRate": 60.0,
+            "subscribeTopic": null,
+            "unit": 4
+        },
+        "type": "HoldingRegisterDatapoint"
+    },
+    {
+        "args": {
+            "address": 40012,
+            "count": 2,
+            "feedbackTopic": null,
+            "label": "Counter2",
+            "publishTopic": "Pub/Counter2",
+            "scanRate": 60.0,
+            "subscribeTopic": null,
+            "unit": 4
+        },
+        "type": "HoldingRegisterDatapoint"
+    },
+    {
+        "args": {
+            "address": 40014,
+            "count": 2,
+            "feedbackTopic": null,
+            "label": "Counter3",
+            "publishTopic": "Pub/Counter3",
+            "scanRate": 60.0,
+            "subscribeTopic": null,
+            "unit": 4
+        },
+        "type": "HoldingRegisterDatapoint"
+    },
+    {
+        "args": {
+            "address": 40016,
+            "count": 2,
+            "feedbackTopic": null,
+            "label": "Counter4",
+            "publishTopic": "Pub/Counter4",
+            "scanRate": 60.0,
+            "subscribeTopic": null,
+            "unit": 4
+        },
+        "type": "HoldingRegisterDatapoint"
+    },
+    {
+        "args": {
+            "address": 40001,
+            "count": 1,
+            "feedbackTopic": null,
+            "label": "Version",
+            "publishTopic": "Pub/Version",
+            "scanRate": 1.0,
+            "subscribeTopic": null,
+            "unit": 4
+        },
+        "type": "HoldingRegisterDatapoint"
+    },
+    {
+        "args": {
+            "address": 40001,
+            "count": 1,
+            "feedbackTopic": null,
+            "label": "Version",
+            "publishTopic": "Pub/Version",
+            "scanRate": 10.0,
+            "subscribeTopic": null,
+            "unit": 4
+        },
+        "type": "HoldingRegisterDatapoint"
+    },
+    {
+        "args": {
+            "address": 40001,
+            "count": 1,
+            "feedbackTopic": "FB/Version",
+            "label": "Version_W",
+            "publishTopic": null,
+            "scanRate": 0.0,
+            "subscribeTopic": "Sub/Version",
+            "unit": 4
+        },
+        "type": "HoldingRegisterDatapoint"
+    }
+]

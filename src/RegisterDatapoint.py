@@ -3,18 +3,45 @@ from pymodbus.pdu import ExceptionResponse
 from pymodbus.exceptions import ModbusIOException
 import MqttProcessor
 import logging
+import json
 import pickle
+
+
+class JsonifyEncoder(json.JSONEncoder):
+    def default(self, o):
+        res = None
+        try:
+            res = o.jsonify()
+        except (TypeError, AttributeError):
+            if type(o) == datetime.timedelta:
+                res = o.total_seconds()
+            else:
+                res = super().default(o)
+        return res
+
+def datapointObjectHook(j):
+    if type(j) == dict and 'type' in j and 'args' in j:
+        klass = eval(j['type'])
+        o = klass(**j['args'])
+        return o
+    else:
+        return j
+
 
 
 class DatapointException(Exception): pass
 
 class AbstractModbusDatapoint(object):
     def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None):
+        self.argList = ['label', 'unit', 'address', 'count', 'scanRate']
         self.label = label
         self.unit = unit
         self.address = address
         self.count = count
-        self.scanRate = scanRate
+        if type(scanRate) == float:
+            self.scanRate = datetime.timedelta(seconds=scanRate)
+        else:
+            self.scanRate = scanRate
         self.type = 'abstract data point'
         self.enqueued = False
         self.lastContact = None
@@ -32,14 +59,21 @@ class AbstractModbusDatapoint(object):
                         self.scanRate, self.enqueued, self.lastContact,
                         self.errorCount, self.processCount))
 
+    def jsonify(self):
+        return {'type':self.__class__.__name__, 
+                'args': { k: getattr(self, k) for k in self.argList }
+               }
+
     def process(self, client):
         raise NotImplementedError
+
 
 
 class HoldingRegisterDatapoint(AbstractModbusDatapoint):
     def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, 
                  publishTopic=None, subscribeTopic=None, feedbackTopic=None):
         super().__init__(label, unit, address, count, scanRate)
+        self.argList = self.argList + ['publishTopic', 'subscribeTopic', 'feedbackTopic']
         self.publishTopic = publishTopic
         self.subscribeTopic = subscribeTopic
         self.feedbackTopic = feedbackTopic
@@ -79,6 +113,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
 class ReadOnlyDatapoint(AbstractModbusDatapoint):
     def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, publishTopic=None):
         super().__init__(label, unit, address, count, scanRate)
+        self.argList = self.argList + ['updateOnly', 'publishTopic']
         self.updateOnly = updateOnly
         self.lastValue = None
         self.publishTopic = publishTopic
@@ -137,39 +172,14 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
 
 
 
-def loadRegisterList(registerList):
-    # Load, check and auto-update registers file
-
-    with open(registerList, 'rb') as f:
-        datapoints = pickle.load(f)
-
-    checkRegisterList(datapoints)
-
-    newDatapoints = []
-    for dp in datapoints:
-        ndp = type(dp)()
-        for k,v in dp.__dict__.items():
-            ndp.__dict__[k] = v
-        newDatapoints.append(ndp)
-        logging.getLogger('loadRegisterList').debug("Datapoint loaded: {0!s}".format(ndp))
-
-    checkRegisterList(newDatapoints, reset=True)
-
-    with open(registerList, 'wb') as f:
-        pickle.dump(newDatapoints, f)
-
-    return newDatapoints
-
-
-def checkRegisterList(registers, reset=False):
-    for r in registers:
-        if not isinstance(r, AbstractModbusDatapoint):
-            raise ValueError('Entry in register list {0!s} is not derived from class AbstractModbusDatapoint'.format(r))        
-        else:
-            if reset:
-                r.errorCount = 0
-                r.processCount = 0
-                r.enqueued = False
-
-
+def saveRegisterList(registerList, registerListFile):
+    js = json.dumps(registerList, cls=JsonifyEncoder, sort_keys=True, indent=4)
+    with open(registerListFile, 'w') as f:
+        f.write(js)
+    
+def loadRegisterList(registerListFile):
+    with open(registerListFile, 'r') as f:
+        js = f.read()
+        registerList = json.loads(js, object_hook=datapointObjectHook)
+        return registerList
 

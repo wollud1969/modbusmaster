@@ -309,23 +309,17 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("DO NOT FORGET TO SAVE AFTERWARDS!")
 
     def do_save(self, arg):
-        for i in self.registers:
-            self.logger.warn("{0!s}: {1!s}".format(i, i.__dict__))
-        with open(self.config.registerFile, 'wb') as f:
-            pickle.dump(self.registers, f)
+        RegisterDatapoint.saveRegisterFile(self.registers, self.config.registerFile)
 
     def help_save(self):
         self.__println("Usage: save")
         self.__println("Saves a modified register list into the register file.")
 
     def do_load(self, arg):
-        registers = None
-        with open(self.config.registerFile, 'rb') as f:
-            registers = pickle.load(f)
         try:
-            RegisterDatapoint.checkRegisterList(registers)
+            registers = RegisterDatapoint.loadRegisterList(self.config.registerFile)
             self.registers = registers
-        except ValueError as e:
+        except Exception as e:
             self.__println("Unable to load register list: {0!s}".format(e))
 
     def help_load(self):

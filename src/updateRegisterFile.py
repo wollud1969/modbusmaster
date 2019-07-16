@@ -1,13 +1,11 @@
 import datetime
 import RegisterDatapoint
 import pickle
-
+import json
 
 
 with open('registers.pkl', 'rb') as f:
     datapoints = pickle.load(f)
-
-RegisterDatapoint.checkRegisterList(datapoints, reset=True)
 
 newDatapoints = []
 for dp in datapoints:
@@ -17,9 +15,10 @@ for dp in datapoints:
             ndp.__dict__[k] = v
     newDatapoints.append(ndp)
 
-RegisterDatapoint.checkRegisterList(newDatapoints, reset=True)
 
-with open('registers.pkl', 'wb') as f:
-    pickle.dump(newDatapoints, f)
 
+js = json.dumps(newDatapoints, cls=RegisterDatapoint.JsonifyEncoder, sort_keys=True, indent=4)
+print(js)
     
+
+RegisterDatapoint.saveRegisterList(newDatapoints, 'registers.json')
