@@ -70,10 +70,10 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
             logger.debug("Holding register, perform write operation")
             self.processCount += 1
             v = int(self.writeRequestValue)
-            result = client.write_register(address=self.address,
+            result = client.write_registers(address=self.address,
                                            unit=self.unit,
-                                           value=v)
-            logger.debug("Write result: {0!s".format(result))                
+                                           values=[v])
+            logger.debug("Write result: {0!s}".format(result))                
             self.writeRequestValue = None
         else:
             # perform read operation
