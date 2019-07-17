@@ -24,7 +24,8 @@ class AbstractModbusDatapoint(object):
         self.enqueued = False
         self.lastContact = None
         self.errorCount = 0
-        self.processCount = 0
+        self.readCount = 0
+        self.writeCount = 0
         if self.scanRate:
             self.priority = 1
         else:
@@ -32,11 +33,11 @@ class AbstractModbusDatapoint(object):
 
     def __str__(self):
         return ("{0}, {1}: unit: {2},  address: {3}, count: {4}, scanRate: {5}, "
-                "enqueued: {6}, lastContact: {7}, errorCount: {8}, processCount: {9}, "
-                "converter: {10}"
+                "enqueued: {6}, lastContact: {7}, errorCount: {8}, readCount: {9}, "
+                "writeCount: {10}, converter: {11}"
                 .format(self.type, self.label, self.unit, self.address, self.count,
                         self.scanRate, self.enqueued, self.lastContact,
-                        self.errorCount, self.processCount, self.converter))
+                        self.errorCount, self.readCount, self.writeCount, self.converter))
 
     def jsonify(self):
         return {'type':self.__class__.__name__, 
@@ -70,7 +71,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
         if self.writeRequestValue:
             # perform write operation
             logger.debug("Holding register, perform write operation")
-            self.processCount += 1
+            self.writeCount += 1
             values = None
             logger.debug("{0}: raw: {1!s}".format(self.label, self.writeRequestValue))
             if self.converter and Converters.Converters[self.converter]['out']:
@@ -89,7 +90,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
         else:
             # perform read operation
             logger.debug("Holding register, perform read operation")
-            self.processCount += 1
+            self.readCount += 1
             result = client.read_holding_registers(address=self.address, 
                                                    count=self.count, 
                                                    unit=self.unit)
@@ -142,7 +143,7 @@ class CoilDatapoint(AbstractModbusDatapoint):
         if self.writeRequestValue:
             # perform write operation
             logger.debug("Coil, perform write operation")
-            self.processCount += 1
+            self.writeCount += 1
             logger.debug("{0}: raw: {1!s}".format(self.label, self.writeRequestValue))
             value=None
             if self.writeRequestValue in ['true', 'True', 'yes', 'Yes', 'On', 'on']:
@@ -160,7 +161,7 @@ class CoilDatapoint(AbstractModbusDatapoint):
         else:
             # perform read operation
             logger.debug("Coil, perform read operation")
-            self.processCount += 1
+            self.readCount += 1
             result = client.read_coils(address=self.address, 
                                        unit=self.unit)
             if type(result) in [ExceptionResponse, ModbusIOException]:
@@ -198,7 +199,7 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
         logger = logging.getLogger('InputRegisterDatapoint')
         # perform read operation
         logger.debug("Input register, perform read operation")
-        self.processCount += 1
+        self.readCount += 1
         result = client.read_input_registers(address=self.address,
                                              count=self.count,
                                              unit=self.unit)
@@ -239,7 +240,7 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
         logger = logging.getLogger('DiscreteInputDatapoint')
         # perform read operation
         logger.debug("Discrete input, perform read operation")
-        self.processCount += 1
+        self.readCount += 1
         result = client.read_discrete_inputs(address=self.address,
                                              count=self.count,
                                              unit=self.unit)

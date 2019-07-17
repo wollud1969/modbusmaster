@@ -253,13 +253,14 @@ class CmdInterpreter(cmd.Cmd):
 
     def do_stats(self, arg):
         for i, r in enumerate(self.registers):
-            if r.processCount == 0:
+            processCount = readCount + writeCount
+            if processCount == 0:
                 ratio = -1
             else:
-                ratio = float(r.errorCount) / float(r.processCount)
-            self.__println("#{0:2d}: {1:15s} ({2:2d}, {3:5d}), pc: {4:7d}, ec: {5:7d}, q: {6:1.4f}"
-                           .format(i, r.label, r.unit, r.address,
-                                   r.processCount, r.errorCount, ratio))
+                ratio = float(r.errorCount) / float(processCount)
+            self.__println("#{0:2d}: {1:15s} ({2:2d}, {3:5d}), rc: {4:7d}, wc: {4:7d}, pc: {4:7d}, ec: {5:7d}, q: {6:1.4f}"
+                           .format(i, r.label, r.unit, r.address, r.readCount, r.writeCount
+                                   processCount, r.errorCount, ratio))
 
     def help_stats(self):
         self.__println("Usage: stats")
