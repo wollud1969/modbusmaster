@@ -3,7 +3,7 @@
 # out: from MQTT to Modbus, input is the format received from MQTT, output shall be a list of 
 #      16bit integers to be written to the Modbus slave
 
-import struct
+from struct import pack, unpack
 
 
 Converters = {
@@ -12,7 +12,7 @@ Converters = {
         "out": None
     },
     "uint32": {
-        "in": lambda x : struct.unpack('I', x)[0],
-        "out": lambda x : struct.pack('I', x)
+        "in": lambda x : unpack('L', pack('HH', *x))[0],
+        "out": lambda x : unpack('HH', pack('L', x))
     }
 }
