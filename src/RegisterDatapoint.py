@@ -170,6 +170,7 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
         self.argList = self.argList + ['bitCount']
         self.type = 'discrete input'
         self.bitCount = bitCount
+        self.lastValues = [None] * self.bitCount
 
     def __str__(self):
         return ("[{0!s}, bitCount: {1}"
@@ -186,11 +187,12 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
         if type(result) in [ExceptionResponse, ModbusIOException]:
             self.errorCount += 1
             raise DatapointException(result)
-        if not self.updateOnly or (result.bits != self.lastValue):
-            self.lastValue = result.bits
-            logger.debug("{0}: {1!s}".format(self.label, result.bits))
-            if self.publishTopic:
-                for i in range(self.bitCount):
+        logger.debug("{0}: raw: {1!s}".format(self.label, result.bits))
+        for i in range(self.bitCount):
+            if not self.updateOnly or (result.getBit(i) != self.lastValues[i]):
+                self.lastValues[i] = result.getBit(i)
+                logger.debug("{0}, {1}: changed: {2!s}".format(self.label, i, result.getBit(i)))
+                if self.publishTopic:
                     pubQueue.put(MqttProcessor.PublishItem("{0}/{1}".format(self.publishTopic, i), str(result.getBit(i))))
         self.lastContact = datetime.datetime.now()
 
