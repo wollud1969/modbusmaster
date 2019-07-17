@@ -41,12 +41,12 @@
         "args": {
             "address": 40010,
             "count": 2,
-            "feedbackTopic": null,
+            "feedbackTopic": "FB/Counter1",
             "label": "Counter1",
             "converter": "uint32",
             "publishTopic": "Pub/Counter1",
             "scanRate": null,
-            "subscribeTopic": null,
+            "subscribeTopic": "Sub/Counter1",
             "unit": 4
         },
         "type": "HoldingRegisterDatapoint"
@@ -55,12 +55,12 @@
         "args": {
             "address": 40012,
             "count": 2,
-            "feedbackTopic": null,
+            "feedbackTopic": "FB/Counter2",
             "label": "Counter2",
             "converter": "uint32",
             "publishTopic": "Pub/Counter2",
             "scanRate": null,
-            "subscribeTopic": null,
+            "subscribeTopic": "Pub/Counter2",
             "unit": 4
         },
         "type": "HoldingRegisterDatapoint"
@@ -69,26 +69,12 @@
         "args": {
             "address": 40014,
             "count": 2,
-            "feedbackTopic": null,
+            "feedbackTopic": "FB/Counter3",
             "label": "Counter3",
             "converter": "uint32",
             "publishTopic": "Pub/Counter3",
             "scanRate": null,
-            "subscribeTopic": null,
-            "unit": 4
-        },
-        "type": "HoldingRegisterDatapoint"
-    },
-    {
-        "args": {
-            "address": 40016,
-            "count": 2,
-            "feedbackTopic": null,
-            "label": "Counter4",
-            "converter": "uint32",
-            "publishTopic": "Pub/Counter4",
-            "scanRate": 1.0,
-            "subscribeTopic": null,
+            "subscribeTopic": "FB/Counter3",
             "unit": 4
         },
         "type": "HoldingRegisterDatapoint"
@@ -98,12 +84,13 @@
             "address": 40016,
             "count": 2,
             "feedbackTopic": "FB/Counter4",
-            "label": "Counter4_W",
-            "publishTopic": null,
-            "scanRate": 0.0,
+            "label": "Counter4",
+            "converter": "uint32",
+            "publishTopic": "Pub/Counter4",
+            "scanRate": 1.0,
             "subscribeTopic": "Sub/Counter4",
             "unit": 4
         },
         "type": "HoldingRegisterDatapoint"
-    }
+    },
 ]

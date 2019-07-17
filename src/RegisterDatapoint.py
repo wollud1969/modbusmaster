@@ -106,7 +106,8 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
                     raise DatapointException("Exception caught when trying to converter modbus data: {0!s}".format(e))
             else:
                 value = result.registers
-            pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(value)))
+            if self.publishTopic:
+                pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(value)))
             self.lastContact = datetime.datetime.now()
     
     def onMessage(self, value):
@@ -157,7 +158,8 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
                     raise DatapointException("Exception caught when trying to converter modbus data: {0!s}".format(e))
             else:
                 value = result.registers
-            pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(value)))
+            if self.publishTopic:
+                pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(value)))
         self.lastContact = datetime.datetime.now()
 
 
@@ -186,8 +188,9 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
         if not self.updateOnly or (result.bits != self.lastValue):
             self.lastValue = result.bits
             logger.debug("{0}: {1!s}".format(self.label, result.bits))
-            for i in range(self.bitCount):
-                pubQueue.put(MqttProcessor.PublishItem("{0}/{1}".format(self.publishTopic, i), str(result.getBit(i))))
+            if self.publishTopic:
+                for i in range(self.bitCount):
+                    pubQueue.put(MqttProcessor.PublishItem("{0}/{1}".format(self.publishTopic, i), str(result.getBit(i))))
         self.lastContact = datetime.datetime.now()
 
 

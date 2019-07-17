@@ -71,20 +71,6 @@ class CmdInterpreter(cmd.Cmd):
             address = parseIntArbitraryBase(address)
             count = parseIntArbitraryBase(count)
             scanrate = float(scanrate)
-            if scanrate == 0:
-                if readTopic:
-                    raise CmdInterpreterException('readTopic must not be set when scanRate is zero')
-                if not writeTopic:
-                    raise CmdInterpreterException('writeTopic must be set when scanRate is zero')
-                if not feedbackTopic:
-                    raise CmdInterpreterException('feedbackTopic must be set when scanRate is zero')
-            else:
-                if not readTopic:
-                    raise CmdInterpreterException('readTopic must be set when scanRate is zero')
-                if writeTopic:
-                    raise CmdInterpreterException('writeTopic must not be set when scanRate is zero')
-                if feedbackTopic:
-                    raise CmdInterpreterException('feedbackTopic must not be set when scanRate is zero')
             r = RegisterDatapoint.HoldingRegisterDatapoint(label, unit, address, count, datetime.timedelta(seconds=scanrate), readTopic, writeTopic, feedbackTopic)
             self.registers.append(r)
         except ValueError as e:
@@ -136,8 +122,6 @@ class CmdInterpreter(cmd.Cmd):
             address = parseIntArbitraryBase(address)
             count = parseIntArbitraryBase(count)
             scanrate = float(scanrate)
-            if scanrate == 0.0:
-                raise CmdInterpreterException('scanRate must not be zero')
             r = RegisterDatapoint.InputRegisterDatapoint(label, unit, address, count, datetime.timedelta(seconds=scanrate), updateOnly, readTopic)
             self.registers.append(r)
         except ValueError as e:
@@ -180,8 +164,6 @@ class CmdInterpreter(cmd.Cmd):
             address = parseIntArbitraryBase(address)
             count = parseIntArbitraryBase(count)
             scanrate = float(scanrate)
-            if scanrate == 0.0:
-                raise CmdInterpreterException('scanRate must not be zero')
             r = RegisterDatapoint.DiscreteInputDatapoint(label, unit, address, count, datetime.timedelta(seconds=scanrate), updateOnly, readTopic)
             self.registers.append(r)
         except ValueError as e:
