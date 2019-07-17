@@ -135,7 +135,7 @@ class CoilDatapoint(AbstractModbusDatapoint):
                         self.publishTopic, self.subscribeTopic, self.feedbackTopic))
 
     def onMessage(self, value):
-        self.writeRequestValue = value
+        self.writeRequestValue = value.decode()
 
     def process(self, client, pubQueue):
         logger = logging.getLogger('CoilDatapoint')
@@ -161,12 +161,12 @@ class CoilDatapoint(AbstractModbusDatapoint):
             # perform read operation
             logger.debug("Coil, perform read operation")
             self.processCount += 1
-            result = client.read_coil(address=self.address, 
-                                      unit=self.unit)
+            result = client.read_coils(address=self.address, 
+                                       unit=self.unit)
             if type(result) in [ExceptionResponse, ModbusIOException]:
                 self.errorCount += 1
                 raise DatapointException(result)
-            logger.debug("{0}: {1!s}".format(self.label, result.registers))
+            logger.debug("{0}: {1!s}".format(self.label, result.getBit(0)))
             value = result.getBit(0)
             if self.publishTopic:
                 pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(value)))
