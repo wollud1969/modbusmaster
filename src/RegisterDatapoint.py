@@ -111,7 +111,8 @@ class ReadOnlyDatapoint(AbstractModbusDatapoint):
 
 
 class InputRegisterDatapoint(ReadOnlyDatapoint):
-    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, publishTopic=None, converter=None):
+    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, 
+                 publishTopic=None, converter=None):
         super().__init__(label, unit, address, count, scanRate, updateOnly, publishTopic, converter)
         self.type = 'input register'
 
@@ -143,9 +144,11 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
 
 
 class DiscreteInputDatapoint(ReadOnlyDatapoint):
-    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, publishTopic=None, converter=None):
+    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, 
+                 publishTopic=None, converter=None, bitCount=8):
         super().__init__(label, unit, address, count, scanRate, updateOnly, publishTopic, converter)
         self.type = 'discrete input'
+        self.bitCount = bitCount
 
     def process(self, client, pubQueue):
         logger = logging.getLogger('DiscreteInputDatapoint')
@@ -160,8 +163,9 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
             raise DatapointException(result)
         if not self.updateOnly or (result.bits != self.lastValue):
             self.lastValue = result.bits
-            logger.debug("{0}: {1!s}".format(self.label, result.bits))        
-            pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.bits)))
+            logger.debug("{0}: {1!s}".format(self.label, result.bits))
+            for i in range(self.bitCount):
+                pubQueue.put(MqttProcessor.PublishItem("{0}/{1}".format(self.publishTopic, i), str(result.getBit(i))))
         self.lastContact = datetime.datetime.now()
 
 
