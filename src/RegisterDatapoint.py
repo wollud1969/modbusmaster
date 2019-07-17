@@ -10,7 +10,7 @@ class DatapointException(Exception): pass
 
 class AbstractModbusDatapoint(object):
     def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, converter=None):
-        self.argList = ['label', 'unit', 'address', 'count', 'scanRate']
+        self.argList = ['label', 'unit', 'address', 'count', 'scanRate', 'converter']
         self.label = label
         self.unit = unit
         self.address = address
@@ -167,6 +167,7 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
     def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, 
                  publishTopic=None, converter=None, bitCount=8):
         super().__init__(label, unit, address, count, scanRate, updateOnly, publishTopic, converter)
+        self.argList = self.argList + ['bitCount']
         self.type = 'discrete input'
         self.bitCount = bitCount
 

@@ -13,6 +13,6 @@ Converters = {
     },
     "uint32": {
         "in": lambda x : unpack('L', pack('HH', *x))[0],
-        "out": lambda x : unpack('HH', pack('L', x))
+        "out": lambda x : unpack('HH', pack('L', int(x)))
     }
 }
