@@ -92,5 +92,17 @@
             "unit": 4
         },
         "type": "HoldingRegisterDatapoint"
+    },
+    {
+        "args": {
+            "address": 0,
+            "feedbackTopic": "FB/Coil1",
+            "label": "Coil1",
+            "publishTopic": "Pub/Coil1",
+            "scanRate": 1.0,
+            "subscribeTopic": "Sub/Coil1",
+            "unit": 4
+        },
+        "type": "CoilDatapoint"
     }
 ]

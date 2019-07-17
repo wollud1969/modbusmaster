@@ -114,6 +114,65 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
         self.writeRequestValue = value
 
 
+class CoilDatapoint(AbstractModbusDatapoint):
+    def __init__(self, label=None, unit=None, address=None, scanRate=None, publishTopic=None, subscribeTopic=None,
+                 feedbackTopic=None):
+        super().__init__(label, unit, address, 1, scanRate, None)
+        self.argList = ['label', 'unit','address','scanRate','publishTopic', 'subscribeTopic', 'feedbackTopic']
+        self.publishTopic = publishTopic
+        self.subscribeTopic = subscribeTopic
+        self.feedbackTopic = feedbackTopic
+        self.writeRequestValue = None
+        self.type = 'coil'
+
+    def __str__(self):
+        return ("{0}, {1}: unit: {2},  address: {3}, scanRate: {4}, "
+                "enqueued: {5}, lastContact: {6}, errorCount: {7}, processCount: {8}, "
+                "publishTopic: {9}, subscribeTopic: {10}, feedbackTopic: {11}"
+                .format(self.type, self.label, self.unit, self.address,
+                        self.scanRate, self.enqueued, self.lastContact,
+                        self.errorCount, self.processCount, 
+                        self.publishTopic, self.subscribeTopic, self.feedbackTopic))
+
+    def onMessage(self, value):
+        self.writeRequestValue = value
+
+    def process(self, client, pubQueue):
+        logger = logging.getLogger('CoilDatapoint')
+        if self.writeRequestValue:
+            # perform write operation
+            logger.debug("Coil, perform write operation")
+            self.processCount += 1
+            logger.debug("{0}: raw: {1!s}".format(self.label, self.writeRequestValue))
+            value=None
+            if self.writeRequestValue in ['true', 'True', 'yes', 'Yes', 'On', 'on']:
+                value = True
+            elif self.writeRequestValue in ['false', 'False', 'no', 'No', 'Off', 'off']:
+                value = False
+            else:
+                self.writeRequestValue = None
+                raise DatapointException('illegal value {0!s} for coil write'.format(self.writeRequestValue))
+            result = client.write_coil(address=self.address,
+                                       unit=self.unit,
+                                       value=value)
+            logger.debug("Write result: {0!s}".format(result))                
+            self.writeRequestValue = None
+        else:
+            # perform read operation
+            logger.debug("Coil, perform read operation")
+            self.processCount += 1
+            result = client.read_coil(address=self.address, 
+                                      unit=self.unit)
+            if type(result) in [ExceptionResponse, ModbusIOException]:
+                self.errorCount += 1
+                raise DatapointException(result)
+            logger.debug("{0}: {1!s}".format(self.label, result.registers))
+            value = result.getBit(0)
+            if self.publishTopic:
+                pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(value)))
+            self.lastContact = datetime.datetime.now()
+
+
 class ReadOnlyDatapoint(AbstractModbusDatapoint):
     def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, publishTopic=None, converter=None):
         super().__init__(label, unit, address, count, scanRate, converter)
