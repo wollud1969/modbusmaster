@@ -51,7 +51,7 @@ class CmdInterpreter(cmd.Cmd):
     
     def do_add_hr(self, arg):
         try:
-            (label, unit, address, count, scanrate, readTopic, writeTopic, feedbackTopic) = self.splitterRe.split(arg)
+            (label, unit, address, count, scanrate, readTopic, writeTopic, feedbackTopic, converter) = self.splitterRe.split(arg)
             self.__println("Label:         {0}".format(label))
             self.__println("Unit:          {0}".format(unit))
             self.__println("Address:       {0}".format(address))
@@ -60,6 +60,7 @@ class CmdInterpreter(cmd.Cmd):
             self.__println("ReadTopic:     {0}".format(readTopic))
             self.__println("WriteTopic:    {0}".format(writeTopic))
             self.__println("FeedbackTopic: {0}".format(feedbackTopic))
+            self.__println("Converter:     {0}".format(converter))
 
             if readTopic == 'None':
                 readTopic = None
@@ -67,19 +68,22 @@ class CmdInterpreter(cmd.Cmd):
                 writeTopic = None
             if feedbackTopic == 'None':
                 feedbackTopic = None
+            if converter == 'None':
+                converter = None
             unit = parseIntArbitraryBase(unit)
             address = parseIntArbitraryBase(address)
             count = parseIntArbitraryBase(count)
             scanrate = float(scanrate)
-            r = RegisterDatapoint.HoldingRegisterDatapoint(label, unit, address, count, datetime.timedelta(seconds=scanrate), readTopic, writeTopic, feedbackTopic)
+            r = RegisterDatapoint.HoldingRegisterDatapoint(label, unit, address, count, datetime.timedelta(seconds=scanrate), readTopic, writeTopic, feedbackTopic, converter)
             self.registers.append(r)
         except ValueError as e:
             self.__println("ERROR: {0!s}, {1!s}".format(e.__class__.__name__, e))
 
     def help_add_hr(self):
         # HoldingRegisterDatapoint('Voltage', 1, 0x2000, 2, datetime.timedelta(seconds=10), 'Pub/Voltage', None, None),
-        self.__println("Usage: add <Label> <Unit> <Address> <Count> <ScanRate>")
-        self.__println("           <ReadTopic> <WriteTopic> <FeedbackTopic>")
+        self.__println("Usage: add_hr <Label> <Unit> <Address> <Count> <ScanRate>")
+        self.__println("              <ReadTopic> <WriteTopic> <FeedbackTopic>")
+        self.__println("              <Converter>")
         self.__println("Adds a holding register")
         self.__println("DO NOT FORGET TO SAVE AFTERWARDS!")
         self.__println("---------------------------------------------------------------------")
@@ -93,15 +97,53 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("<WriteTopic>                 Topic to be subscribe to receive data to be")
         self.__println("                             written")
         self.__println("<FeedbackTopic>              Topic to publish feedback after a write process,")
-        self.__println("")
-        self.__println("For read items the <ScanRate> must be non-zero, a <ReadTopic> must be set and")
-        self.__println("<WriteTopic> and <FeedbackTopic> must be <None>.")
-        self.__println("For write items the <ScanRate> must be zero, <ReadTopic> must be <None> and ")
-        self.__println("<WriteTopic> and <FeedbackTopic> must be set.")
+        self.__println("<Converter>                  Converter for data")
 
+    
+    def do_add_coil(self, arg):
+        try:
+            (label, unit, address, scanrate, readTopic, writeTopic, feedbackTopic) = self.splitterRe.split(arg)
+            self.__println("Label:         {0}".format(label))
+            self.__println("Unit:          {0}".format(unit))
+            self.__println("Address:       {0}".format(address))
+            self.__println("ScanRate:      {0}".format(scanrate))
+            self.__println("ReadTopic:     {0}".format(readTopic))
+            self.__println("WriteTopic:    {0}".format(writeTopic))
+            self.__println("FeedbackTopic: {0}".format(feedbackTopic))
+
+            if readTopic == 'None':
+                readTopic = None
+            if writeTopic == 'None':
+                writeTopic = None
+            if feedbackTopic == 'None':
+                feedbackTopic = None
+            unit = parseIntArbitraryBase(unit)
+            address = parseIntArbitraryBase(address)
+            scanrate = float(scanrate)
+            r = RegisterDatapoint.CoilDatapoint(label, unit, address, datetime.timedelta(seconds=scanrate), readTopic, writeTopic, feedbackTopic)
+            self.registers.append(r)
+        except ValueError as e:
+            self.__println("ERROR: {0!s}, {1!s}".format(e.__class__.__name__, e))
+
+    def help_add_coil(self):
+        self.__println("Usage: add_coil <Label> <Unit> <Address> <ScanRate>")
+        self.__println("                <ReadTopic> <WriteTopic> <FeedbackTopic>")
+        self.__println("Adds a coil")
+        self.__println("DO NOT FORGET TO SAVE AFTERWARDS!")
+        self.__println("---------------------------------------------------------------------")
+        self.__println("<Label>                      Descriptive label")
+        self.__println("<Unit>                       Modbus address of the device")
+        self.__println("<Address>                    Register address within the device")
+        self.__println("<ScanRate>                   Scanrate in seconds (float), for write datapoints")
+        self.__println("                             set to zero (0)")
+        self.__println("<ReadTopic>                  Topic to publish read data")
+        self.__println("<WriteTopic>                 Topic to be subscribe to receive data to be")
+        self.__println("                             written")
+        self.__println("<FeedbackTopic>              Topic to publish feedback after a write process,")
+    
     def do_add_ir(self, arg):
         try:
-            (label, unit, address, count, scanrate, updateOnly, readTopic) = self.splitterRe.split(arg)
+            (label, unit, address, count, scanrate, updateOnly, readTopic, converter) = self.splitterRe.split(arg)
             self.__println("Label:         {0}".format(label))
             self.__println("Unit:          {0}".format(unit))
             self.__println("Address:       {0}".format(address))
@@ -109,9 +151,12 @@ class CmdInterpreter(cmd.Cmd):
             self.__println("ScanRate:      {0}".format(scanrate))
             self.__println("UpdateOnly:    {0}".format(updateOnly))
             self.__println("ReadTopic:     {0}".format(readTopic))
+            self.__println("Converter:     {0}".format(converter))
 
             if readTopic == 'None':
                 readTopic = None
+            if converter == 'None':
+                converter = None
             if updateOnly in ['true', 'True', 'yes', 'Yes']:
                 updateOnly = True
             elif updateOnly in ['false', 'False', 'no', 'No']:
@@ -122,14 +167,14 @@ class CmdInterpreter(cmd.Cmd):
             address = parseIntArbitraryBase(address)
             count = parseIntArbitraryBase(count)
             scanrate = float(scanrate)
-            r = RegisterDatapoint.InputRegisterDatapoint(label, unit, address, count, datetime.timedelta(seconds=scanrate), updateOnly, readTopic)
+            r = RegisterDatapoint.InputRegisterDatapoint(label, unit, address, count, datetime.timedelta(seconds=scanrate), updateOnly, readTopic, converter)
             self.registers.append(r)
         except ValueError as e:
             self.__println("ERROR: {0!s}, {1!s}".format(e.__class__.__name__, e))
 
     def help_add_ir(self):
-        self.__println("Usage: add <Label> <Unit> <Address> <Count> <ScanRate>")
-        self.__println("           <UpdateOnly> <ReadTopic>")
+        self.__println("Usage: add_ir <Label> <Unit> <Address> <Count> <ScanRate>")
+        self.__println("              <UpdateOnly> <ReadTopic> <Converter>")
         self.__println("Adds an input register")
         self.__println("DO NOT FORGET TO SAVE AFTERWARDS!")
         self.__println("---------------------------------------------------------------------")
@@ -140,10 +185,11 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("<ScanRate>                   Scanrate in seconds (float)")
         self.__println("<UpdateOnly>                 Publish only when value has changed")
         self.__println("<ReadTopic>                  Topic to publish read data")
+        self.__println("<Converter>                  Converter for data")
 
     def do_add_di(self, arg):
         try:
-            (label, unit, address, count, scanrate, updateOnly, readTopic) = self.splitterRe.split(arg)
+            (label, unit, address, count, scanrate, updateOnly, readTopic, bitCount) = self.splitterRe.split(arg)
             self.__println("Label:         {0}".format(label))
             self.__println("Unit:          {0}".format(unit))
             self.__println("Address:       {0}".format(address))
@@ -151,6 +197,7 @@ class CmdInterpreter(cmd.Cmd):
             self.__println("ScanRate:      {0}".format(scanrate))
             self.__println("UpdateOnly:    {0}".format(updateOnly))
             self.__println("ReadTopic:     {0}".format(readTopic))
+            self.__println("BitCount:      {0}".format(bitCount))
 
             if readTopic == 'None':
                 readTopic = None
@@ -164,14 +211,15 @@ class CmdInterpreter(cmd.Cmd):
             address = parseIntArbitraryBase(address)
             count = parseIntArbitraryBase(count)
             scanrate = float(scanrate)
-            r = RegisterDatapoint.DiscreteInputDatapoint(label, unit, address, count, datetime.timedelta(seconds=scanrate), updateOnly, readTopic)
+            bitCount = int(bitCount)
+            r = RegisterDatapoint.DiscreteInputDatapoint(label, unit, address, count, datetime.timedelta(seconds=scanrate), updateOnly, readTopic, None, bitCount)
             self.registers.append(r)
         except ValueError as e:
             self.__println("ERROR: {0!s}, {1!s}".format(e.__class__.__name__, e))
 
     def help_add_di(self):
-        self.__println("Usage: add <Label> <Unit> <Address> <Count> <ScanRate>")
-        self.__println("           <UpdateOnly> <ReadTopic>")
+        self.__println("Usage: add_di <Label> <Unit> <Address> <Count> <ScanRate>")
+        self.__println("              <UpdateOnly> <ReadTopic> <bitCount>")
         self.__println("Adds a discrete input")
         self.__println("DO NOT FORGET TO SAVE AFTERWARDS!")
         self.__println("---------------------------------------------------------------------")
@@ -182,6 +230,7 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("<ScanRate>                   Scanrate in seconds (float)")
         self.__println("<UpdateOnly>                 Publish only when value has changed")
         self.__println("<ReadTopic>                  Topic to publish read data")
+        self.__println("<BitCount>                   Number of bit to be considered")
 
     def do_list(self, arg):
         for i, r in enumerate(self.registers):
