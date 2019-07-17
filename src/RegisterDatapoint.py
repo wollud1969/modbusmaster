@@ -71,10 +71,19 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
             # perform write operation
             logger.debug("Holding register, perform write operation")
             self.processCount += 1
-            v = int(self.writeRequestValue)
+            values = None
+            logger.debug("{0}: raw: {1!s}".format(self.label, self.writeRequestValue))
+            if self.converter and Converters.Converters[self.converter]['out']:
+                try:
+                    values = Converters.Converters[self.converter]['out'](self.writeRequestValue)
+                    logger.debug("{0}: converted: {1!s}".format(self.label, values))
+                except Exception as e:
+                    raise DatapointException("Exception caught when trying to converter modbus data: {0!s}".format(e))
+            else:
+                values = [int(self.writeRequestValue)]
             result = client.write_registers(address=self.address,
                                            unit=self.unit,
-                                           values=[v])
+                                           values=values)
             logger.debug("Write result: {0!s}".format(result))                
             self.writeRequestValue = None
         else:
@@ -88,7 +97,16 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
                 self.errorCount += 1
                 raise DatapointException(result)
             logger.debug("{0}: {1!s}".format(self.label, result.registers))
-            pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.registers)))
+            value = None
+            if self.converter and Converters.Converters[self.converter]['in']:
+                try:
+                    value = Converters.Converters[self.converter]['in'](result.registers)
+                    logger.debug("{0}: converted: {1!s}".format(self.label, value))
+                except Exception as e:
+                    raise DatapointException("Exception caught when trying to converter modbus data: {0!s}".format(e))
+            else:
+                value = result.registers
+            pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(value)))
             self.lastContact = datetime.datetime.now()
     
     def onMessage(self, value):
