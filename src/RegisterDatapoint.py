@@ -4,17 +4,18 @@ from pymodbus.exceptions import ModbusIOException
 import MqttProcessor
 import logging
 import json
-
+import Converters
 
 class DatapointException(Exception): pass
 
 class AbstractModbusDatapoint(object):
-    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None):
+    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, converter=None):
         self.argList = ['label', 'unit', 'address', 'count', 'scanRate']
         self.label = label
         self.unit = unit
         self.address = address
         self.count = count
+        self.converter = None
         if type(scanRate) == float:
             self.scanRate = datetime.timedelta(seconds=scanRate)
         else:
@@ -31,10 +32,11 @@ class AbstractModbusDatapoint(object):
 
     def __str__(self):
         return ("{0}, {1}: unit: {2},  address: {3}, count: {4}, scanRate: {5}, "
-                "enqueued: {6}, lastContact: {7}, errorCount: {8}, processCount: {9}"
+                "enqueued: {6}, lastContact: {7}, errorCount: {8}, processCount: {9}, "
+                "converter: {10}"
                 .format(self.type, self.label, self.unit, self.address, self.count,
                         self.scanRate, self.enqueued, self.lastContact,
-                        self.errorCount, self.processCount))
+                        self.errorCount, self.processCount, self.converter))
 
     def jsonify(self):
         return {'type':self.__class__.__name__, 
@@ -126,8 +128,16 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
             raise DatapointException(result)
         if not self.updateOnly or (result.registers != self.lastValue):
             self.lastValue = result.registers
-            logger.debug("{0}: {1!s}".format(self.label, result.registers))        
-            pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(result.registers)))
+            logger.debug("{0}: {1!s}".format(self.label, result.registers))
+            value = None
+            if Converters.Converters[self.converter]['in']:
+                try:
+                    value = Converters.Converters[self.converter]['in'](result.registers)
+                except Exception as e:
+                    raise DatapointException("Exception caught when trying to converter modbus data: {0!s}".format(e))
+            else:
+                value = result.registers
+            pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(value)))
         self.lastContact = datetime.datetime.now()
 
 
