@@ -150,6 +150,10 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
         self.type = 'discrete input'
         self.bitCount = bitCount
 
+    def __str__(self):
+        return ("[{0!s}, bitCount: {1}"
+                .format(super().__str__(), self.bitCount))
+
     def process(self, client, pubQueue):
         logger = logging.getLogger('DiscreteInputDatapoint')
         # perform read operation
