@@ -15,7 +15,7 @@ class AbstractModbusDatapoint(object):
         self.unit = unit
         self.address = address
         self.count = count
-        self.converter = None
+        self.converter = converter
         if type(scanRate) == float:
             self.scanRate = datetime.timedelta(seconds=scanRate)
         else:
@@ -50,8 +50,8 @@ class AbstractModbusDatapoint(object):
 
 class HoldingRegisterDatapoint(AbstractModbusDatapoint):
     def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, 
-                 publishTopic=None, subscribeTopic=None, feedbackTopic=None):
-        super().__init__(label, unit, address, count, scanRate)
+                 publishTopic=None, subscribeTopic=None, feedbackTopic=None, converter=None):
+        super().__init__(label, unit, address, count, scanRate, converter)
         self.argList = self.argList + ['publishTopic', 'subscribeTopic', 'feedbackTopic']
         self.publishTopic = publishTopic
         self.subscribeTopic = subscribeTopic
@@ -96,8 +96,8 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
 
 
 class ReadOnlyDatapoint(AbstractModbusDatapoint):
-    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, publishTopic=None):
-        super().__init__(label, unit, address, count, scanRate)
+    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, publishTopic=None, converter=None):
+        super().__init__(label, unit, address, count, scanRate, converter)
         self.argList = self.argList + ['updateOnly', 'publishTopic']
         self.updateOnly = updateOnly
         self.lastValue = None
@@ -111,8 +111,8 @@ class ReadOnlyDatapoint(AbstractModbusDatapoint):
 
 
 class InputRegisterDatapoint(ReadOnlyDatapoint):
-    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, publishTopic=None):
-        super().__init__(label, unit, address, count, scanRate, updateOnly, publishTopic)
+    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, publishTopic=None, converter=None):
+        super().__init__(label, unit, address, count, scanRate, updateOnly, publishTopic, converter)
         self.type = 'input register'
 
     def process(self, client, pubQueue):
@@ -128,11 +128,12 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
             raise DatapointException(result)
         if not self.updateOnly or (result.registers != self.lastValue):
             self.lastValue = result.registers
-            logger.debug("{0}: {1!s}".format(self.label, result.registers))
+            logger.debug("{0}: raw: {1!s}".format(self.label, result.registers))
             value = None
-            if Converters.Converters[self.converter]['in']:
+            if self.converter and Converters.Converters[self.converter]['in']:
                 try:
                     value = Converters.Converters[self.converter]['in'](result.registers)
+                    logger.debug("{0}: converted: {1!s}".format(self.label, value))
                 except Exception as e:
                     raise DatapointException("Exception caught when trying to converter modbus data: {0!s}".format(e))
             else:
@@ -142,8 +143,8 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
 
 
 class DiscreteInputDatapoint(ReadOnlyDatapoint):
-    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, publishTopic=None):
-        super().__init__(label, unit, address, count, scanRate, updateOnly, publishTopic)
+    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, publishTopic=None, converter=None):
+        super().__init__(label, unit, address, count, scanRate, updateOnly, publishTopic, converter)
         self.type = 'discrete input'
 
     def process(self, client, pubQueue):

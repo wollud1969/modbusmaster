@@ -6,7 +6,7 @@
             "label": "Temperature",
             "converter": "dht20TOFloat",
             "publishTopic": "Pub/Temperature",
-            "scanRate": null,
+            "scanRate": 1.0,
             "unit": 5,
             "updateOnly": false
         },
