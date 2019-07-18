@@ -33,9 +33,11 @@ class CmdInterpreter(cmd.Cmd):
 
     def onecmd(self, line):
         try:
-            return self.onecmd(line)
+            return super().onecmd(line)
         except Exception as e:
             msg = 'Caught exception in cmd "{0}": {1!s}'.format(line, e)
+            self.__println(msg)
+            self.logger.error(msg)
 
     def __print(self, text):
         self.stdout.write(text)
