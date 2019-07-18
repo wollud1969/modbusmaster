@@ -6,6 +6,7 @@ import io
 import datetime
 import RegisterDatapoint
 import logging
+import Converters
 
 class CmdInterpreterException(ValueError): pass
 
@@ -46,17 +47,10 @@ class CmdInterpreter(cmd.Cmd):
         self.stdout.write(text)
         self.stdout.write("\n\r")
 
-    def do_notify(self, arg):
-        self.notifier.notify()
-
-    def help_notify(self):
-        self.__println("Notifies threads using the list of datapoints about changes in this list.")
-        self.__println("Call after modifications on the list.")
-
-    def do_quit(self, arg):
-        self.__println("Bye!")
-        return True
     
+    def __listConverterNames(self):
+        return [ name for name in Converters.Converters ]
+
     def do_add_hr(self, arg):
         try:
             (label, unit, address, count, scanrate, readTopic, writeTopic, feedbackTopic, converter) = self.splitterRe.split(arg)
@@ -82,7 +76,15 @@ class CmdInterpreter(cmd.Cmd):
             address = parseIntArbitraryBase(address)
             count = parseIntArbitraryBase(count)
             scanrate = float(scanrate)
-            r = RegisterDatapoint.HoldingRegisterDatapoint(label, unit, address, count, datetime.timedelta(seconds=scanrate), readTopic, writeTopic, feedbackTopic, converter)
+            r = RegisterDatapoint.HoldingRegisterDatapoint(label=label, 
+                                                           unit=unit, 
+                                                           address=address, 
+                                                           count=count, 
+                                                           scanRate=datetime.timedelta(seconds=scanrate), 
+                                                           publishTopic=readTopic, 
+                                                           subscribe=writeTopic, 
+                                                           feedbackTopic=feedbackTopic, 
+                                                           converter=converter)
             self.registers.append(r)
         except ValueError as e:
             self.__println("ERROR: {0!s}, {1!s}".format(e.__class__.__name__, e))
@@ -105,7 +107,7 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("<WriteTopic>                 Topic to be subscribe to receive data to be")
         self.__println("                             written")
         self.__println("<FeedbackTopic>              Topic to publish feedback after a write process,")
-        self.__println("<Converter>                  Converter for data")
+        self.__println("<Converter>                  Converter for data, one of {0}".format(', '.join(self.__listConverterNames())))
 
     
     def do_add_coil(self, arg):
@@ -128,7 +130,13 @@ class CmdInterpreter(cmd.Cmd):
             unit = parseIntArbitraryBase(unit)
             address = parseIntArbitraryBase(address)
             scanrate = float(scanrate)
-            r = RegisterDatapoint.CoilDatapoint(label, unit, address, datetime.timedelta(seconds=scanrate), readTopic, writeTopic, feedbackTopic)
+            r = RegisterDatapoint.CoilDatapoint(label=label, 
+                                                unit=unit, 
+                                                address=address, 
+                                                scanRate=datetime.timedelta(seconds=scanrate), 
+                                                publishTopic=readTopic, 
+                                                subscribeTopic=writeTopic, 
+                                                feedbackTopic=feedbackTopic)
             self.registers.append(r)
         except ValueError as e:
             self.__println("ERROR: {0!s}, {1!s}".format(e.__class__.__name__, e))
@@ -175,7 +183,13 @@ class CmdInterpreter(cmd.Cmd):
             address = parseIntArbitraryBase(address)
             count = parseIntArbitraryBase(count)
             scanrate = float(scanrate)
-            r = RegisterDatapoint.InputRegisterDatapoint(label, unit, address, count, datetime.timedelta(seconds=scanrate), updateOnly, readTopic, converter)
+            r = RegisterDatapoint.InputRegisterDatapoint(label=label, 
+                                                         unit=unit, 
+                                                         address=address, 
+                                                         count=count, scanRate=datetime.timedelta(seconds=scanrate), 
+                                                         updateOnly=updateOnly, 
+                                                         publishTopic=readTopic, 
+                                                         converter=converter)
             self.registers.append(r)
         except ValueError as e:
             self.__println("ERROR: {0!s}, {1!s}".format(e.__class__.__name__, e))
@@ -193,7 +207,7 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("<ScanRate>                   Scanrate in seconds (float)")
         self.__println("<UpdateOnly>                 Publish only when value has changed")
         self.__println("<ReadTopic>                  Topic to publish read data")
-        self.__println("<Converter>                  Converter for data")
+        self.__println("<Converter>                  Converter for data, one of {0}".format(', '.join(self.__listConverterNames())))
 
     def do_add_di(self, arg):
         try:
@@ -220,7 +234,14 @@ class CmdInterpreter(cmd.Cmd):
             count = parseIntArbitraryBase(count)
             scanrate = float(scanrate)
             bitCount = int(bitCount)
-            r = RegisterDatapoint.DiscreteInputDatapoint(label, unit, address, count, datetime.timedelta(seconds=scanrate), updateOnly, readTopic, None, bitCount)
+            r = RegisterDatapoint.DiscreteInputDatapoint(label=label, 
+                                                         unit=unit, 
+                                                         address=address, 
+                                                         count=count, 
+                                                         scanRate=datetime.timedelta(seconds=scanrate), 
+                                                         updateOnly=updateOnly, 
+                                                         publishTopic=readTopic, 
+                                                         bitCount=bitCount)
             self.registers.append(r)
         except ValueError as e:
             self.__println("ERROR: {0!s}, {1!s}".format(e.__class__.__name__, e))
@@ -275,8 +296,6 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("-----------")
         self.__println("List the statistics of configured datapoints")
 
-
-
     def do_change(self, arg):
         (idx, key, typ, value) = self.splitterRe.split(arg)
         try:
@@ -328,9 +347,6 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("                                      considered)")
         self.__println("<value>                    New value")
 
-
-
-
     def do_del(self, arg):
         try:
             i = int(arg)
@@ -346,8 +362,23 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("Be aware: indexes have been changed, rerun list before removing the next item.")
         self.__println("DO NOT FORGET TO SAVE AFTERWARDS!")
 
-    def do_save(self, arg):
+    def __notify(self):
+        self.notifier.notify()
+
+    def do_notify(self, arg):
+        self.__notify()
+
+    def help_notify(self):
+        self.__println("Notifies threads using the list of datapoints about changes in this list.")
+        self.__println("Call after modifications on the list.")
+
+    def do_quit(self, arg):
+        self.__println("Bye!")
+        return True    def __save(self):
         RegisterDatapoint.saveRegisterList(self.registers, self.config.registerFile)
+
+    def do_save(self, arg):
+        self.__save()
 
     def help_save(self):
         self.__println("Usage: save")
