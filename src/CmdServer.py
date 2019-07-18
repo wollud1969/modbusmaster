@@ -374,7 +374,9 @@ class CmdInterpreter(cmd.Cmd):
 
     def do_quit(self, arg):
         self.__println("Bye!")
-        return True    def __save(self):
+        return True    
+
+    def __save(self):
         RegisterDatapoint.saveRegisterList(self.registers, self.config.registerFile)
 
     def do_save(self, arg):
