@@ -31,6 +31,12 @@ class CmdInterpreter(cmd.Cmd):
         self.splitterRe = re.compile('\s+')
         self.logger = logging.getLogger('CmdInterpreter')
 
+    def onecmd(self, line):
+        try:
+            return self.onecmd(line)
+        except Exception as e:
+            msg = 'Caught exception in cmd "{0}": {1!s}'.format(line, e)
+
     def __print(self, text):
         self.stdout.write(text)
 
