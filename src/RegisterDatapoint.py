@@ -74,14 +74,14 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
             self.writeCount += 1
             values = None
             logger.debug("{0}: raw: {1!s}".format(self.label, self.writeRequestValue))
-            if self.converter and Converters.Converters[self.converter]['out']:
-                try:
+            try:
+                if self.converter and Converters.Converters[self.converter]['out']:
                     values = Converters.Converters[self.converter]['out'](self.writeRequestValue)
                     logger.debug("{0}: converted: {1!s}".format(self.label, values))
-                except Exception as e:
-                    raise DatapointException("Exception caught when trying to converter modbus data: {0!s}".format(e))
-            else:
-                values = [int(self.writeRequestValue)]
+                else:
+                    values = [int(self.writeRequestValue)]
+            except Exception as e:
+                raise DatapointException("Exception caught when trying to converter modbus data: {0!s}".format(e))
             result = client.write_registers(address=self.address,
                                            unit=self.unit,
                                            values=values)
@@ -99,14 +99,14 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
                 raise DatapointException(result)
             logger.debug("{0}: {1!s}".format(self.label, result.registers))
             value = None
-            if self.converter and Converters.Converters[self.converter]['in']:
-                try:
+            try:
+                if self.converter and Converters.Converters[self.converter]['in']:
                     value = Converters.Converters[self.converter]['in'](result.registers)
                     logger.debug("{0}: converted: {1!s}".format(self.label, value))
-                except Exception as e:
-                    raise DatapointException("Exception caught when trying to converter modbus data: {0!s}".format(e))
-            else:
-                value = result.registers
+                else:
+                    value = result.registers
+            except Exception as e:
+                raise DatapointException("Exception caught when trying to converter modbus data: {0!s}".format(e))
             if self.publishTopic:
                 pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(value)))
             self.lastContact = datetime.datetime.now()
@@ -210,14 +210,14 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
             self.lastValue = result.registers
             logger.debug("{0}: raw: {1!s}".format(self.label, result.registers))
             value = None
-            if self.converter and Converters.Converters[self.converter]['in']:
-                try:
+            try:
+                if self.converter and Converters.Converters[self.converter]['in']:
                     value = Converters.Converters[self.converter]['in'](result.registers)
                     logger.debug("{0}: converted: {1!s}".format(self.label, value))
-                except Exception as e:
-                    raise DatapointException("Exception caught when trying to converter modbus data: {0!s}".format(e))
-            else:
-                value = result.registers
+                else:
+                    value = result.registers
+            except Exception as e:
+                raise DatapointException("Exception caught when trying to converter modbus data: {0!s}".format(e))
             if self.publishTopic:
                 pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(value)))
         self.lastContact = datetime.datetime.now()
