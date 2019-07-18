@@ -47,7 +47,8 @@ class CmdInterpreter(cmd.Cmd):
         self.stdout.write(text)
         self.stdout.write("\n\r")
 
-    
+
+
     def __listConverterNames(self):
         return [ name for name in Converters.Converters ]
 
