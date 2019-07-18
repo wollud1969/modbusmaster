@@ -128,11 +128,11 @@ class CoilDatapoint(AbstractModbusDatapoint):
 
     def __str__(self):
         return ("{0}, {1}: unit: {2},  address: {3}, scanRate: {4}, "
-                "enqueued: {5}, lastContact: {6}, errorCount: {7}, processCount: {8}, "
-                "publishTopic: {9}, subscribeTopic: {10}, feedbackTopic: {11}"
+                "enqueued: {5}, lastContact: {6}, errorCount: {7}, readCount: {8}, "
+                "writeCount: {9}, publishTopic: {10}, subscribeTopic: {11}, feedbackTopic: {12}"
                 .format(self.type, self.label, self.unit, self.address,
                         self.scanRate, self.enqueued, self.lastContact,
-                        self.errorCount, self.processCount, 
+                        self.errorCount, self.readCount, self.writeCount, 
                         self.publishTopic, self.subscribeTopic, self.feedbackTopic))
 
     def onMessage(self, value):
