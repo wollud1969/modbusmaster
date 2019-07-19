@@ -274,7 +274,8 @@ class CmdInterpreter(cmd.Cmd):
     def do_reset(self, arg):
         for r in self.registers:
             r.errorCount = 0
-            r.processCount = 0
+            r.writeCount = 0
+            r.readCount = 0
     
     def help_reset(self):
         self.__println("Usage: reset")
