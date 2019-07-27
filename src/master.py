@@ -49,16 +49,15 @@ if __name__ == "__main__":
     mp.start()
     logger.debug('MqttProcessor started')
 
-    qf = ScanRateConsideringQueueFeeder.ScanRateConsideringQueueFeeder(config, datapoints, queue)
-    nf.register(qf)
-    qf.start()
-    logger.debug('ScanRateConsideringQueueFeeder started')
-
     cs = CmdServer.CmdServer(config, nf, datapoints)
     cs.start()
     logger.debug('CmdServer started')
 
-    hb = Heartbeat.HeartBeat(config, pubQueue)
+    hb = Heartbeat.Heartbeat(config, pubQueue)
     hb.start()
     logger.debug('Heartbeat started')
     
+    qf = ScanRateConsideringQueueFeeder.ScanRateConsideringQueueFeeder(config, datapoints, queue)
+    nf.register(qf)
+    qf.start()
+    logger.debug('ScanRateConsideringQueueFeeder started')

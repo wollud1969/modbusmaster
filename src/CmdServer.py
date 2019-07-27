@@ -428,9 +428,9 @@ class CmdServer(threading.Thread):
         super().__init__()
         self.config = config
         self.server = MyThreadingTCPServer((config.cmdAddress, config.cmdPort), CmdHandle, MyCmdUserData(config, notifier, registers))
-        self.daemon = True
+        # self.daemon = True
 
-    def start(self):
+    def run(self):
         self.server.serve_forever()
 
 

@@ -9,6 +9,9 @@ class PublishItem(object):
         self.topic = topic
         self.payload = payload
 
+    def __str__(self):
+        return 'Topic: {0}, Payload: {1}'.format(self.topic, self.payload)
+
 def mqttOnConnectCallback(client, userdata, flags, rc):
     userdata.onConnect()
 
@@ -28,7 +31,7 @@ class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
         self.client = mqtt.Client(userdata=self)
         self.subscriptions = []
         self.topicRegisterMap ={}
-        self.daemon = True
+        # self.daemon = True
         self.logger = logging.getLogger('MqttProcessor')
 
     def __processUpdatedRegisters(self, force=False):
@@ -67,6 +70,7 @@ class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
         while True:
             pubItem = self.pubQueue.get()
             if isinstance(pubItem, PublishItem):
+                self.logger.debug('Publishing {0!s}'.format(pubItem))
                 self.client.publish(pubItem.topic, pubItem.payload)
                 Pins.pinsWrite('MSG', False)
             else:

@@ -10,7 +10,7 @@ class ScanRateConsideringQueueFeeder(threading.Thread, AbstractNotificationRecei
         self.registers = registers
         self.queue = queue
         self.delayEvent = threading.Event()
-        self.daemon = True
+        # self.daemon = True
         self.logger = logging.getLogger('ScanRateConsideringQueueFeeder')
 
     def getMinimalScanrate(self):

@@ -23,5 +23,5 @@ class MyRS485(serial.Serial):
             if self.buf[0] & termios.TIOCSER_TEMT:
                 break
         # wiringpi.digitalWrite(DE_PIN, wiringpi.LOW)
-        Pins.pinsWrite('DE', False
+        Pins.pinsWrite('DE', False)
 

@@ -20,7 +20,7 @@ class CommunicationProcessor(threading.Thread):
         self.pubQueue = pubQueue
         # wiringpi.wiringPiSetup()
         # wiringpi.pinMode(ERROR_PIN, wiringpi.OUTPUT)
-        self.daemon = True
+        # self.daemon = True
         if self.config.modbusDebug:
             logging.getLogger('pymodbus').setLevel(logging.DEBUG)
         else:

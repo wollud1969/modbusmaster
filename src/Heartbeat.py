@@ -8,7 +8,7 @@ class Heartbeat(threading.Thread):
         super().__init__()
         self.config = config
         self.pubQueue = pubQueue
-        self.daemon = True
+        # self.daemon = True
         self.logger = logging.getLogger('Heartbeat')
 
     def run(self):
