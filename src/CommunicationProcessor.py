@@ -3,7 +3,8 @@ import datetime
 # import RS485Ext
 import RegisterDatapoint
 from pymodbus.client.sync import ModbusSerialClient
-import wiringpi
+# import wiringpi
+import Pins
 import MyRS485
 import time
 import logging
@@ -17,8 +18,8 @@ class CommunicationProcessor(threading.Thread):
         self.config = config
         self.queue = queue
         self.pubQueue = pubQueue
-        wiringpi.wiringPiSetup()
-        wiringpi.pinMode(ERROR_PIN, wiringpi.OUTPUT)
+        # wiringpi.wiringPiSetup()
+        # wiringpi.pinMode(ERROR_PIN, wiringpi.OUTPUT)
         self.daemon = True
         if self.config.modbusDebug:
             logging.getLogger('pymodbus').setLevel(logging.DEBUG)
@@ -41,12 +42,14 @@ class CommunicationProcessor(threading.Thread):
         while True:
             r = self.queue.get()
             try:
-                wiringpi.digitalWrite(ERROR_PIN, wiringpi.LOW)
+                # wiringpi.digitalWrite(ERROR_PIN, wiringpi.LOW)
+                Pins.pinsWrite('ERROR', False)
                 self.logger.debug("Dequeued: {0!s}".format(r))
                 r.enqueued = False
                 r.process(client, self.pubQueue)
             except RegisterDatapoint.DatapointException as e:
-                wiringpi.digitalWrite(ERROR_PIN, wiringpi.HIGH)
+                # wiringpi.digitalWrite(ERROR_PIN, wiringpi.HIGH)
+                Pins.pinsWrite('ERROR', True)
                 self.logger.error("ERROR when processing '{0}': {1!s}".format(r.label, e))
                 if client.socket is None:
                     self.logger.error("renew socket")

@@ -10,8 +10,8 @@ import datetime
 import RegisterDatapoint
 import pickle
 import logging
-
-
+import Pins
+import Heartbeat
 
 
 if __name__ == "__main__":
@@ -28,6 +28,8 @@ if __name__ == "__main__":
     ch.setFormatter(formatter)
     logger.addHandler(fh)
     logger.addHandler(ch)
+
+    Pins.pinsInit()
 
     queue = MyPriorityQueue.MyPriorityQueue()
     pubQueue = Queue()
@@ -55,3 +57,8 @@ if __name__ == "__main__":
     cs = CmdServer.CmdServer(config, nf, datapoints)
     cs.start()
     logger.debug('CmdServer started')
+
+    hb = Heartbeat.HeartBeat(config, pubQueue)
+    hb.start()
+    logger.debug('Heartbeat started')
+    

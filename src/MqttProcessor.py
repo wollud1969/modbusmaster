@@ -2,7 +2,7 @@ import threading
 import paho.mqtt.client as mqtt
 from NotificationForwarder import AbstractNotificationReceiver
 import logging
-
+import Pins
 
 class PublishItem(object):
     def __init__(self, topic, payload):
@@ -68,6 +68,7 @@ class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
             pubItem = self.pubQueue.get()
             if isinstance(pubItem, PublishItem):
                 self.client.publish(pubItem.topic, pubItem.payload)
+                Pins.pinsWrite('MSG', False)
             else:
                 self.logger.error("Invalid object in publish queue")
 
@@ -80,6 +81,7 @@ class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
         self.logger.error("Disconnected from MQTT broker: {0}".format(rc))
 
     def onMessage(self, topic, payload):
+        Pins.pinsWrite('MSG', True)
         # print("MqttProcessor.onMessage")
         r = self.topicRegisterMap[topic]
         self.logger.debug("{0}: {1!s} -> {2!s}".format(topic, payload, r))

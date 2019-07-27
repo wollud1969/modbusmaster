@@ -13,3 +13,5 @@ class Config(object):
         self.serialPort = '/dev/ttyAMA0'
         self.serialBaudRate = 9600
         self.interCommDelay = 0.025
+        self.heartbeatTopic = 'Iot/Heartbeat/Modbus2'
+        self.heartbeatPeriod = 10.0
