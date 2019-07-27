@@ -5,8 +5,8 @@
             "converter": "dht20TOFloat",
             "count": 1,
             "label": "Temperature",
-            "publishTopic": "Pub/Temperature",
-            "scanRate": 10.0,
+            "publishTopic": "IoT/Measurment/Modbus2/Laundry/Temperature",
+            "scanRate": 60.0,
             "unit": 5,
             "updateOnly": false
         },
@@ -18,8 +18,8 @@
             "converter": "dht20TOFloat",
             "count": 1,
             "label": "Humidity",
-            "publishTopic": "Pub/Humidity",
-            "scanRate": null,
+            "publishTopic": "IoT/Measurment/Modbus2/Laundry/Humidity",
+            "scanRate": 60.0,
             "unit": 5,
             "updateOnly": false
         },
@@ -33,7 +33,7 @@
             "count": 1,
             "label": "Switches",
             "publishTopic": "Pub/Switches",
-            "scanRate": null,
+            "scanRate": 0.5,
             "unit": 4,
             "updateOnly": false
         },
