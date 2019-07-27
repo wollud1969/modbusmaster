@@ -59,6 +59,8 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
         self.feedbackTopic = feedbackTopic
         self.writeRequestValue = None
         self.type = 'holding register'
+        self.lastException = None
+        self.lastReadValue = None
 
     def __str__(self):
         return ("[{0!s}, publishTopic: {1}, subscribeTopic: {2}, feedbackTopic: {3}, "
@@ -81,6 +83,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
                 else:
                     values = [int(self.writeRequestValue)]
             except Exception as e:
+                self.lastException = e
                 raise DatapointException("Exception caught when trying to converter modbus data: {0!s}".format(e))
             result = client.write_registers(address=self.address,
                                            unit=self.unit,
@@ -96,6 +99,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
                                                    unit=self.unit)
             if type(result) in [ExceptionResponse, ModbusIOException]:
                 self.errorCount += 1
+                self.lastException = result
                 raise DatapointException(result)
             logger.debug("{0}: {1!s}".format(self.label, result.registers))
             value = None
@@ -106,7 +110,9 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
                 else:
                     value = result.registers
             except Exception as e:
+                self.lastException = e
                 raise DatapointException("Exception caught when trying to converter modbus data: {0!s}".format(e))
+            self.lastReadValue = value
             if self.publishTopic:
                 pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(value)))
             self.lastContact = datetime.datetime.now()
