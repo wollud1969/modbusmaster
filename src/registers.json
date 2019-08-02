@@ -32,7 +32,7 @@
             "converter": null,
             "count": 1,
             "label": "Switches",
-            "publishTopic": "Pub/Switches",
+            "publishTopic": "IoT/Status/Modbus2/Switches",
             "scanRate": 0.5,
             "unit": 4,
             "updateOnly": false
@@ -41,80 +41,12 @@
     },
     {
         "args": {
-            "address": 40010,
-            "converter": "uint32",
-            "count": 2,
-            "feedbackTopic": "FB/Counter1",
-            "label": "Counter1",
-            "publishTopic": "Pub/Counter1",
-            "scanRate": 1.0,
-            "subscribeTopic": "Sub/Counter1",
-            "unit": 4
-        },
-        "type": "HoldingRegisterDatapoint"
-    },
-    {
-        "args": {
-            "address": 40012,
-            "converter": "uint32",
-            "count": 2,
-            "feedbackTopic": "FB/Counter2",
-            "label": "Counter2",
-            "publishTopic": "Pub/Counter2",
-            "scanRate": null,
-            "subscribeTopic": "Pub/Counter2",
-            "unit": 4
-        },
-        "type": "HoldingRegisterDatapoint"
-    },
-    {
-        "args": {
-            "address": 40014,
-            "converter": "uint32",
-            "count": 2,
-            "feedbackTopic": "FB/Counter3",
-            "label": "Counter3",
-            "publishTopic": "Pub/Counter3",
-            "scanRate": null,
-            "subscribeTopic": "FB/Counter3",
-            "unit": 4
-        },
-        "type": "HoldingRegisterDatapoint"
-    },
-    {
-        "args": {
-            "address": 40016,
-            "converter": "uint32",
-            "count": 2,
-            "feedbackTopic": "FB/Counter4",
-            "label": "Counter4",
-            "publishTopic": "Pub/Counter4",
-            "scanRate": 1.0,
-            "subscribeTopic": "Sub/Counter4",
-            "unit": 4
-        },
-        "type": "HoldingRegisterDatapoint"
-    },
-    {
-        "args": {
             "address": 0,
-            "feedbackTopic": "FB/Coil1",
+            "feedbackTopic": "IoT/Feedback/Modbus2/Coils/1",
             "label": "Coil1",
-            "publishTopic": "Pub/Coil1",
-            "scanRate": 1.0,
-            "subscribeTopic": "Sub/Coil1",
-            "unit": 4
-        },
-        "type": "CoilDatapoint"
-    },
-    {
-        "args": {
-            "address": 1,
-            "feedbackTopic": "FB/Coil2",
-            "label": "Coil2",
-            "publishTopic": "Pub/Coil2",
-            "scanRate": 1.0,
-            "subscribeTopic": "Sub/Coil2",
+            "publishTopic": "IoT/Status/Modbus2/Coils/1",
+            "scanRate": 0.0,
+            "subscribeTopic": "IoT/Action/Modbus2/Coils/1",
             "unit": 4
         },
         "type": "CoilDatapoint"
