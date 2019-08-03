@@ -42,11 +42,11 @@
     {
         "args": {
             "address": 0,
-            "feedbackTopic": "IoT/Feedback/Modbus2/Coils/1",
-            "label": "Coil1",
-            "publishTopic": "IoT/Status/Modbus2/Coils/1",
+            "feedbackTopic": "IoT/Feedback/Modbus2/Coils/0",
+            "label": "Coil0",
+            "publishTopic": "IoT/Status/Modbus2/Coils/0",
             "scanRate": 0.0,
-            "subscribeTopic": "IoT/Action/Modbus2/Coils/1",
+            "subscribeTopic": "IoT/Action/Modbus2/Coils/0",
             "unit": 4
         },
         "type": "CoilDatapoint"
