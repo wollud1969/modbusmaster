@@ -35,7 +35,7 @@
             "publishTopic": "IoT/Status/Modbus2/Switches",
             "scanRate": 0.5,
             "unit": 4,
-            "updateOnly": false
+            "updateOnly": true
         },
         "type": "DiscreteInputDatapoint"
     },
@@ -47,6 +47,42 @@
             "publishTopic": "IoT/Status/Modbus2/Coils/0",
             "scanRate": 0.0,
             "subscribeTopic": "IoT/Action/Modbus2/Coils/0",
+            "unit": 4
+        },
+        "type": "CoilDatapoint"
+    },
+    {
+        "args": {
+            "address": 1,
+            "feedbackTopic": "IoT/Feedback/Modbus2/Coils/1",
+            "label": "Coil1",
+            "publishTopic": "IoT/Status/Modbus2/Coils/1",
+            "scanRate": 0.0,
+            "subscribeTopic": "IoT/Action/Modbus2/Coils/1",
+            "unit": 4
+        },
+        "type": "CoilDatapoint"
+    },
+    {
+        "args": {
+            "address": 2,
+            "feedbackTopic": "IoT/Feedback/Modbus2/Coils/2",
+            "label": "Coil2",
+            "publishTopic": "IoT/Status/Modbus2/Coils/2",
+            "scanRate": 0.0,
+            "subscribeTopic": "IoT/Action/Modbus2/Coils/2",
+            "unit": 4
+        },
+        "type": "CoilDatapoint"
+    },
+    {
+        "args": {
+            "address": 3,
+            "feedbackTopic": "IoT/Feedback/Modbus2/Coils/3",
+            "label": "Coil3",
+            "publishTopic": "IoT/Status/Modbus2/Coils/3",
+            "scanRate": 0.0,
+            "subscribeTopic": "IoT/Action/Modbus2/Coils/3",
             "unit": 4
         },
         "type": "CoilDatapoint"
