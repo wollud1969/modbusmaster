@@ -23,6 +23,8 @@ deploy:
         only:
                 - deploy
         script:
+                - sudo service modbusMaster stop
                 - cp src/*.py /opt/services/modbusMaster
                 - cp src/modbusMaster.service /opt/services/modbusMaster
-
+                - sudo service modbusMaster start
+                
