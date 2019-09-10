@@ -6,7 +6,10 @@ import logging
 import json
 import Converters
 
-class DatapointException(Exception): pass
+
+class DatapointException(Exception):
+    pass
+
 
 class AbstractModbusDatapoint(object):
     def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, converter=None):
@@ -40,17 +43,16 @@ class AbstractModbusDatapoint(object):
                         self.errorCount, self.readCount, self.writeCount, self.converter))
 
     def jsonify(self):
-        return {'type':self.__class__.__name__, 
-                'args': { k: getattr(self, k) for k in self.argList }
-               }
+        return {'type': self.__class__.__name__,
+                'args': {k: getattr(self, k) for k in self.argList}
+                }
 
     def process(self, client):
         raise NotImplementedError
 
 
-
 class HoldingRegisterDatapoint(AbstractModbusDatapoint):
-    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, 
+    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None,
                  publishTopic=None, subscribeTopic=None, feedbackTopic=None, converter=None):
         super().__init__(label, unit, address, count, scanRate, converter)
         self.argList = self.argList + ['publishTopic', 'subscribeTopic', 'feedbackTopic']
@@ -83,16 +85,16 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
             except Exception as e:
                 raise DatapointException("Exception caught when trying to converter modbus data: {0!s}".format(e))
             result = client.write_registers(address=self.address,
-                                           unit=self.unit,
-                                           values=values)
-            logger.debug("Write result: {0!s}".format(result))                
+                                            unit=self.unit,
+                                            values=values)
+            logger.debug("Write result: {0!s}".format(result))
             self.writeRequestValue = None
         else:
             # perform read operation
             logger.debug("Holding register, perform read operation")
             self.readCount += 1
-            result = client.read_holding_registers(address=self.address, 
-                                                   count=self.count, 
+            result = client.read_holding_registers(address=self.address,
+                                                   count=self.count,
                                                    unit=self.unit)
             if type(result) in [ExceptionResponse, ModbusIOException]:
                 self.errorCount += 1
@@ -110,7 +112,7 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
             if self.publishTopic:
                 pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(value)))
             self.lastContact = datetime.datetime.now()
-    
+
     def onMessage(self, value):
         self.writeRequestValue = value
 
@@ -119,7 +121,7 @@ class CoilDatapoint(AbstractModbusDatapoint):
     def __init__(self, label=None, unit=None, address=None, scanRate=None, publishTopic=None, subscribeTopic=None,
                  feedbackTopic=None):
         super().__init__(label, unit, address, 1, scanRate, None)
-        self.argList = ['label', 'unit','address','scanRate','publishTopic', 'subscribeTopic', 'feedbackTopic']
+        self.argList = ['label', 'unit', 'address', 'scanRate', 'publishTopic', 'subscribeTopic', 'feedbackTopic']
         self.publishTopic = publishTopic
         self.subscribeTopic = subscribeTopic
         self.feedbackTopic = feedbackTopic
@@ -132,7 +134,7 @@ class CoilDatapoint(AbstractModbusDatapoint):
                 "writeCount: {9}, publishTopic: {10}, subscribeTopic: {11}, feedbackTopic: {12}"
                 .format(self.type, self.label, self.unit, self.address,
                         self.scanRate, self.enqueued, self.lastContact,
-                        self.errorCount, self.readCount, self.writeCount, 
+                        self.errorCount, self.readCount, self.writeCount,
                         self.publishTopic, self.subscribeTopic, self.feedbackTopic))
 
     def onMessage(self, value):
@@ -145,7 +147,7 @@ class CoilDatapoint(AbstractModbusDatapoint):
             logger.debug("Coil, perform write operation")
             self.writeCount += 1
             logger.debug("{0}: raw: {1!s}".format(self.label, self.writeRequestValue))
-            value=None
+            value = None
             if self.writeRequestValue in ['true', 'True', 'yes', 'Yes', 'On', 'on']:
                 value = True
             elif self.writeRequestValue in ['false', 'False', 'no', 'No', 'Off', 'off']:
@@ -156,13 +158,13 @@ class CoilDatapoint(AbstractModbusDatapoint):
             result = client.write_coil(address=self.address,
                                        unit=self.unit,
                                        value=value)
-            logger.debug("Write result: {0!s}".format(result))                
+            logger.debug("Write result: {0!s}".format(result))
             self.writeRequestValue = None
         else:
             # perform read operation
             logger.debug("Coil, perform read operation")
             self.readCount += 1
-            result = client.read_coils(address=self.address, 
+            result = client.read_coils(address=self.address,
                                        unit=self.unit)
             if type(result) in [ExceptionResponse, ModbusIOException]:
                 self.errorCount += 1
@@ -175,7 +177,8 @@ class CoilDatapoint(AbstractModbusDatapoint):
 
 
 class ReadOnlyDatapoint(AbstractModbusDatapoint):
-    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, publishTopic=None, converter=None):
+    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None,
+                 publishTopic=None, converter=None):
         super().__init__(label, unit, address, count, scanRate, converter)
         self.argList = self.argList + ['updateOnly', 'publishTopic']
         self.updateOnly = updateOnly
@@ -188,9 +191,8 @@ class ReadOnlyDatapoint(AbstractModbusDatapoint):
                         self.lastValue))
 
 
-
 class InputRegisterDatapoint(ReadOnlyDatapoint):
-    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, 
+    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None,
                  publishTopic=None, converter=None):
         super().__init__(label, unit, address, count, scanRate, updateOnly, publishTopic, converter)
         self.type = 'input register'
@@ -224,7 +226,7 @@ class InputRegisterDatapoint(ReadOnlyDatapoint):
 
 
 class DiscreteInputDatapoint(ReadOnlyDatapoint):
-    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None, 
+    def __init__(self, label=None, unit=None, address=None, count=None, scanRate=None, updateOnly=None,
                  publishTopic=None, converter=None, bitCount=8):
         super().__init__(label, unit, address, count, scanRate, updateOnly, publishTopic, converter)
         self.argList = self.argList + ['bitCount']
@@ -253,10 +255,9 @@ class DiscreteInputDatapoint(ReadOnlyDatapoint):
                 self.lastValues[i] = result.getBit(i)
                 logger.debug("{0}, {1}: changed: {2!s}".format(self.label, i, result.getBit(i)))
                 if self.publishTopic:
-                    pubQueue.put(MqttProcessor.PublishItem("{0}/{1}".format(self.publishTopic, i), str(result.getBit(i))))
+                    pubQueue.put(MqttProcessor.PublishItem("{0}/{1}"
+                                                           .format(self.publishTopic, i), str(result.getBit(i))))
         self.lastContact = datetime.datetime.now()
-
-
 
 
 class JsonifyEncoder(json.JSONEncoder):
@@ -271,6 +272,7 @@ class JsonifyEncoder(json.JSONEncoder):
                 res = super().default(o)
         return res
 
+
 def datapointObjectHook(j):
     if type(j) == dict and 'type' in j and 'args' in j:
         klass = eval(j['type'])
@@ -279,14 +281,15 @@ def datapointObjectHook(j):
     else:
         return j
 
+
 def saveRegisterList(registerList, registerListFile):
     js = json.dumps(registerList, cls=JsonifyEncoder, sort_keys=True, indent=4)
     with open(registerListFile, 'w') as f:
         f.write(js)
-    
+
+
 def loadRegisterList(registerListFile):
     with open(registerListFile, 'r') as f:
         js = f.read()
         registerList = json.loads(js, object_hook=datapointObjectHook)
         return registerList
-

@@ -8,7 +8,6 @@ PINS = {
 }
 
 
-
 def pinsInit():
     wiringpi.wiringPiSetup()
     for pin in PINS.values():
@@ -21,4 +20,3 @@ def pinsWrite(pinName, v):
     else:
         pinState = wiringpi.LOW
     wiringpi.digitalWrite(PINS[pinName], pinState)
-

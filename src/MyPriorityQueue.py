@@ -12,6 +12,7 @@ class MyPriorityQueueItem(object):
     def __gt__(self, other): return self.itemWithPriority.priority > other.itemWithPriority.priority
     def __ge__(self, other): return self.itemWithPriority.priority >= other.itemWithPriority.priority
 
+
 class MyPriorityQueue(queue.PriorityQueue):
     def _put(self, itemWithPriority):
         i = MyPriorityQueueItem(itemWithPriority)

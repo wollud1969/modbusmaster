@@ -4,6 +4,7 @@ from NotificationForwarder import AbstractNotificationReceiver
 import logging
 import Pins
 
+
 class PublishItem(object):
     def __init__(self, topic, payload):
         self.topic = topic
@@ -12,14 +13,18 @@ class PublishItem(object):
     def __str__(self):
         return 'Topic: {0}, Payload: {1}'.format(self.topic, self.payload)
 
+
 def mqttOnConnectCallback(client, userdata, flags, rc):
     userdata.onConnect()
+
 
 def mqttOnMessageCallback(client, userdata, message):
     userdata.onMessage(message.topic, message.payload)
 
+
 def mqttOnDisconnectCallback(client, userdata, rc):
     userdata.onDisconnect(rc)
+
 
 class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
     def __init__(self, config, registers, queue, pubQueue):
@@ -30,14 +35,15 @@ class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
         self.pubQueue = pubQueue
         self.client = mqtt.Client(userdata=self)
         self.subscriptions = []
-        self.topicRegisterMap ={}
+        self.topicRegisterMap = {}
         # self.daemon = True
         self.logger = logging.getLogger('MqttProcessor')
 
     def __processUpdatedRegisters(self, force=False):
         self.logger.debug("MqttProcessor.__updateSubscriptions")
 
-        subscribeTopics = [ r.subscribeTopic for r in self.registers if hasattr(r,'subscribeTopic') and r.subscribeTopic]
+        subscribeTopics = [r.subscribeTopic for r in self.registers if hasattr(r, 'subscribeTopic')
+                           and r.subscribeTopic]
         self.logger.debug("Topics: {0!s}".format(subscribeTopics))
 
         for subscribeTopic in subscribeTopics:
@@ -52,7 +58,8 @@ class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
                 self.client.unsubscribe(subscription)
                 self.subscriptions.remove(subscription)
 
-        self.topicRegisterMap = { r.subscribeTopic: r for r in self.registers if hasattr(r,'subscribeTopic') and r.subscribeTopic }
+        self.topicRegisterMap = {r.subscribeTopic: r for r in self.registers if hasattr(r, 'subscribeTopic')
+                                 and r.subscribeTopic}
 
     def receiveNotification(self, arg):
         self.logger.info("MqttProcessor:registersChanged")
@@ -76,7 +83,6 @@ class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
             else:
                 self.logger.error("Invalid object in publish queue")
 
-
     def onConnect(self):
         # print("MqttProcessor.onConnect")
         self.__processUpdatedRegisters(force=True)
@@ -91,4 +97,3 @@ class MqttProcessor(threading.Thread, AbstractNotificationReceiver):
         self.logger.debug("{0}: {1!s} -> {2!s}".format(topic, payload, r))
         r.onMessage(payload)
         self.queue.put(r)
-

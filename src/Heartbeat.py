@@ -3,6 +3,7 @@ import MqttProcessor
 import logging
 import time
 
+
 class Heartbeat(threading.Thread):
     def __init__(self, config, pubQueue):
         super().__init__()

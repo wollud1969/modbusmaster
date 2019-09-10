@@ -7,6 +7,7 @@ import termios
 
 DE_PIN = 0
 
+
 class MyRS485(serial.Serial):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -24,4 +25,3 @@ class MyRS485(serial.Serial):
                 break
         # wiringpi.digitalWrite(DE_PIN, wiringpi.LOW)
         Pins.pinsWrite('DE', False)
-
