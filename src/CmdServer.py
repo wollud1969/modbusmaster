@@ -8,7 +8,8 @@ import RegisterDatapoint
 import logging
 import Converters
 
-class CmdInterpreterException(ValueError): 
+
+class CmdInterpreterException(ValueError):
     pass
 
 
@@ -32,7 +33,7 @@ class CmdInterpreter(cmd.Cmd):
         self.registers = registers
         self.prompt = "test8> "
         self.intro = "test8 admin interface"
-        self.splitterRe = re.compile('\s+')
+        self.splitterRe = re.compile(r'\s+')
         self.logger = logging.getLogger('CmdInterpreter')
 
     def onecmd(self, line):
@@ -50,15 +51,14 @@ class CmdInterpreter(cmd.Cmd):
         self.stdout.write(text)
         self.stdout.write("\n\r")
 
-
-
     def __listConverterNames(self):
         return [name for name in Converters.Converters]
 
     def do_add_hr(self, arg):
         try:
-            (label, unit, address, count, scanrate, readTopic, writeTopic, feedbackTopic, converter) = 
-                self.splitterRe.split(arg)
+            (label, unit, address, count,
+             scanrate, readTopic, writeTopic,
+             feedbackTopic, converter) = self.splitterRe.split(arg)
             self.__println("Label:         {0}".format(label))
             self.__println("Unit:          {0}".format(unit))
             self.__println("Address:       {0}".format(address))
@@ -81,14 +81,14 @@ class CmdInterpreter(cmd.Cmd):
             address = parseIntArbitraryBase(address)
             count = parseIntArbitraryBase(count)
             scanrate = float(scanrate)
-            r = RegisterDatapoint.HoldingRegisterDatapoint(label=label, 
-                                                           unit=unit, 
-                                                           address=address, 
-                                                           count=count, 
-                                                           scanRate=datetime.timedelta(seconds=scanrate), 
-                                                           publishTopic=readTopic, 
-                                                           subscribe=writeTopic, 
-                                                           feedbackTopic=feedbackTopic, 
+            r = RegisterDatapoint.HoldingRegisterDatapoint(label=label,
+                                                           unit=unit,
+                                                           address=address,
+                                                           count=count,
+                                                           scanRate=datetime.timedelta(seconds=scanrate),
+                                                           publishTopic=readTopic,
+                                                           subscribe=writeTopic,
+                                                           feedbackTopic=feedbackTopic,
                                                            converter=converter)
             self.registers.append(r)
         except ValueError as e:
@@ -112,9 +112,9 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("<WriteTopic>                 Topic to be subscribe to receive data to be")
         self.__println("                             written")
         self.__println("<FeedbackTopic>              Topic to publish feedback after a write process,")
-        self.__println("<Converter>                  Converter for data, one of {0}".format(', '.join(self.__listConverterNames())))
+        self.__println("<Converter>                  Converter for data, one of {0}"
+                       .format(', '.join(self.__listConverterNames())))
 
-    
     def do_add_coil(self, arg):
         try:
             (label, unit, address, scanrate, readTopic, writeTopic, feedbackTopic) = self.splitterRe.split(arg)
@@ -135,12 +135,12 @@ class CmdInterpreter(cmd.Cmd):
             unit = parseIntArbitraryBase(unit)
             address = parseIntArbitraryBase(address)
             scanrate = float(scanrate)
-            r = RegisterDatapoint.CoilDatapoint(label=label, 
-                                                unit=unit, 
-                                                address=address, 
-                                                scanRate=datetime.timedelta(seconds=scanrate), 
-                                                publishTopic=readTopic, 
-                                                subscribeTopic=writeTopic, 
+            r = RegisterDatapoint.CoilDatapoint(label=label,
+                                                unit=unit,
+                                                address=address,
+                                                scanRate=datetime.timedelta(seconds=scanrate),
+                                                publishTopic=readTopic,
+                                                subscribeTopic=writeTopic,
                                                 feedbackTopic=feedbackTopic)
             self.registers.append(r)
         except ValueError as e:
@@ -161,7 +161,7 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("<WriteTopic>                 Topic to be subscribe to receive data to be")
         self.__println("                             written")
         self.__println("<FeedbackTopic>              Topic to publish feedback after a write process,")
-    
+
     def do_add_ir(self, arg):
         try:
             (label, unit, address, count, scanrate, updateOnly, readTopic, converter) = self.splitterRe.split(arg)
@@ -188,12 +188,12 @@ class CmdInterpreter(cmd.Cmd):
             address = parseIntArbitraryBase(address)
             count = parseIntArbitraryBase(count)
             scanrate = float(scanrate)
-            r = RegisterDatapoint.InputRegisterDatapoint(label=label, 
-                                                         unit=unit, 
-                                                         address=address, 
-                                                         count=count, scanRate=datetime.timedelta(seconds=scanrate), 
-                                                         updateOnly=updateOnly, 
-                                                         publishTopic=readTopic, 
+            r = RegisterDatapoint.InputRegisterDatapoint(label=label,
+                                                         unit=unit,
+                                                         address=address,
+                                                         count=count, scanRate=datetime.timedelta(seconds=scanrate),
+                                                         updateOnly=updateOnly,
+                                                         publishTopic=readTopic,
                                                          converter=converter)
             self.registers.append(r)
         except ValueError as e:
@@ -212,7 +212,8 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("<ScanRate>                   Scanrate in seconds (float)")
         self.__println("<UpdateOnly>                 Publish only when value has changed")
         self.__println("<ReadTopic>                  Topic to publish read data")
-        self.__println("<Converter>                  Converter for data, one of {0}".format(', '.join(self.__listConverterNames())))
+        self.__println("<Converter>                  Converter for data, one of {0}"
+                       .format(', '.join(self.__listConverterNames())))
 
     def do_add_di(self, arg):
         try:
@@ -239,13 +240,13 @@ class CmdInterpreter(cmd.Cmd):
             count = parseIntArbitraryBase(count)
             scanrate = float(scanrate)
             bitCount = int(bitCount)
-            r = RegisterDatapoint.DiscreteInputDatapoint(label=label, 
-                                                         unit=unit, 
-                                                         address=address, 
-                                                         count=count, 
-                                                         scanRate=datetime.timedelta(seconds=scanrate), 
-                                                         updateOnly=updateOnly, 
-                                                         publishTopic=readTopic, 
+            r = RegisterDatapoint.DiscreteInputDatapoint(label=label,
+                                                         unit=unit,
+                                                         address=address,
+                                                         count=count,
+                                                         scanRate=datetime.timedelta(seconds=scanrate),
+                                                         updateOnly=updateOnly,
+                                                         publishTopic=readTopic,
                                                          bitCount=bitCount)
             self.registers.append(r)
         except ValueError as e:
@@ -269,7 +270,7 @@ class CmdInterpreter(cmd.Cmd):
     def do_list(self, arg):
         for i, r in enumerate(self.registers):
             self.__println("#{0}: {1!s}".format(i, r))
-    
+
     def help_list(self):
         self.__println("Usage: list")
         self.__println("-----------")
@@ -280,7 +281,7 @@ class CmdInterpreter(cmd.Cmd):
             r.errorCount = 0
             r.writeCount = 0
             r.readCount = 0
-    
+
     def help_reset(self):
         self.__println("Usage: reset")
         self.__println("-----------")
@@ -293,7 +294,8 @@ class CmdInterpreter(cmd.Cmd):
                 ratio = -1
             else:
                 ratio = float(r.errorCount) / float(processCount)
-            self.__println("#{0:2d}: {1:15s} ({2:2d}, {3:5d}), rc: {4:7d}, wc: {5:7d}, pc: {6:7d}, ec: {7:7d}, q: {8:1.4f}"
+            self.__println("#{0:2d}: {1:15s} ({2:2d}, {3:5d}), rc: {4:7d}, "
+                           "wc: {5:7d}, pc: {6:7d}, ec: {7:7d}, q: {8:1.4f}"
                            .format(i, r.label, r.unit, r.address, r.readCount, r.writeCount,
                                    processCount, r.errorCount, ratio))
 
@@ -328,10 +330,10 @@ class CmdInterpreter(cmd.Cmd):
                 value = None
             else:
                 raise CmdInterpreterException('unknown type specifier, must be I, F, B, S or T')
-            
+
             if key not in r.__dict__:
                 raise CmdInterpreterException('selected datapoint does not support key')
-            
+
             r.__dict__[key] = value
         except ValueError as e:
             self.__println("ERROR: {0!s}, {1!s}".format(e.__class__.__name__, e))
@@ -380,7 +382,7 @@ class CmdInterpreter(cmd.Cmd):
 
     def do_quit(self, arg):
         self.__println("Bye!")
-        return True    
+        return True
 
     def __save(self):
         RegisterDatapoint.saveRegisterList(self.registers, self.config.registerFile)
@@ -404,11 +406,10 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("Reload the register file, overwrite all unsaved changes.")
 
 
-
 class CmdHandle(socketserver.StreamRequestHandler):
     def handle(self):
         logger = logging.getLogger('CmdHandle')
-        cmd = CmdInterpreter(io.TextIOWrapper(self.rfile), io.TextIOWrapper(self.wfile), self.server.userData.config, 
+        cmd = CmdInterpreter(io.TextIOWrapper(self.rfile), io.TextIOWrapper(self.wfile), self.server.userData.config,
                              self.server.userData.notifier, self.server.userData.registers)
         try:
             cmd.cmdloop()
@@ -416,10 +417,12 @@ class CmdHandle(socketserver.StreamRequestHandler):
         except ConnectionAbortedError as e:
             logger.info("Cmd handle externally interrupted")
 
+
 class MyThreadingTCPServer(socketserver.ThreadingTCPServer):
     def __init__(self, host, handler, userData):
         super().__init__(host, handler)
         self.userData = userData
+
 
 class MyCmdUserData(object):
     def __init__(self, config, notifier, registers):
@@ -427,14 +430,15 @@ class MyCmdUserData(object):
         self.notifier = notifier
         self.registers = registers
 
+
 class CmdServer(threading.Thread):
     def __init__(self, config, notifier, registers):
         super().__init__()
         self.config = config
-        self.server = MyThreadingTCPServer((config.cmdAddress, config.cmdPort), CmdHandle, MyCmdUserData(config, notifier, registers))
+        self.server = MyThreadingTCPServer((config.cmdAddress, config.cmdPort),
+                                           CmdHandle,
+                                           MyCmdUserData(config, notifier, registers))
         # self.daemon = True
 
     def run(self):
         self.server.serve_forever()
-
-
