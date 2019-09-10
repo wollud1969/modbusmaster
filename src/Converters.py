@@ -6,6 +6,14 @@
 from struct import pack, unpack
 
 
+def fix1twos(x):
+    x = x[0]
+    r = x
+    if x & 0x8000:
+        r = ((x - 1) ^ 0xffff) * -1
+    return r / 10
+      
+
 Converters = {
     "dht20TOFloat": {
         "in": lambda x : float(x[0]) / 10.0,
@@ -14,5 +22,10 @@ Converters = {
     "uint32": {
         "in": lambda x : unpack('L', pack('HH', *x))[0],
         "out": lambda x : unpack('HH', pack('L', int(x)))
+    },
+    "fix1twos": {
+        "in": lambda x: fix1twos(x),
+        "out": None
     }
 }
+

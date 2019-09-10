@@ -90,7 +90,7 @@
     {
         "args": {
             "address": 1,
-            "converter": "dht20TOFloat",
+            "converter": "fix1twos",
             "count": 1,
             "label": "wago1",
             "publishTopic": "IoT/Measurement/Modbus2/Wago1",
@@ -103,10 +103,10 @@
     {
         "args": {
             "address": 0,
-            "converter": "dht20TOFloat",
+            "converter": "fix1twos",
             "count": 1,
-            "label": "wago0",
-            "publishTopic": "IoT/Measurement/Modbus2/Wago0",
+            "label": "Freezer",
+            "publishTopic": "IoT/Measurement/Modbus2/Freezer",
             "scanRate": 1.0,
             "unit": 11,
             "updateOnly": false
