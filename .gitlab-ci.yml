@@ -10,8 +10,8 @@ build:
                 - linux
                 - docker
         script:
-                - for I in *.py; do python -m py_compile $I; done
-                - for I in *.py; do python -m pycodestyle --max-line-length=120 $I; done
+                - for I in src/*.py; do python -m py_compile $I; done
+                - for I in src/*.py; do python -m pycodestyle --max-line-length=120 $I; done
 
 deploy:
         stage: deploy
