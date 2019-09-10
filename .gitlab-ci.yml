@@ -23,5 +23,6 @@ deploy:
         only:
                 - deploy
         script:
-                - whoami
+                - cp src/*.py /opt/services/modbusMaster
+                
 
