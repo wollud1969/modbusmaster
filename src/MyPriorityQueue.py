@@ -14,7 +14,7 @@ class MyPriorityQueueItem(object):
     def __ne__(self, other): return self.itemWithPriority.priority != other.itemWithPriority.priority
 
     def __gt__(self, other): return self.itemWithPriority.priority > other.itemWithPriority.priority
-    
+
     def __ge__(self, other): return self.itemWithPriority.priority >= other.itemWithPriority.priority
 
 
