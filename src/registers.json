@@ -86,5 +86,31 @@
             "unit": 4
         },
         "type": "CoilDatapoint"
+    },
+    {
+        "args": {
+            "address": 1,
+            "converter": "dht20TOFloat",
+            "count": 1,
+            "label": "wago1",
+            "publishTopic": "IoT/Measurement/Modbus2/Wago1",
+            "scanRate": 1.0,
+            "unit": 11,
+            "updateOnly": false
+        },
+        "type": "InputRegisterDatapoint"
+    },
+    {
+        "args": {
+            "address": 0,
+            "converter": "dht20TOFloat",
+            "count": 1,
+            "label": "wago0",
+            "publishTopic": "IoT/Measurement/Modbus2/Wago0",
+            "scanRate": 1.0,
+            "unit": 11,
+            "updateOnly": false
+        },
+        "type": "InputRegisterDatapoint"
     }
 ]
