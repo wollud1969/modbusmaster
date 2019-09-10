@@ -8,7 +8,9 @@ import RegisterDatapoint
 import logging
 import Converters
 
-class CmdInterpreterException(ValueError): pass
+class CmdInterpreterException(ValueError): 
+    pass
+
 
 def parseIntArbitraryBase(s):
     i = 0
@@ -19,6 +21,7 @@ def parseIntArbitraryBase(s):
     else:
         i = int(s, 10)
     return i
+
 
 class CmdInterpreter(cmd.Cmd):
     def __init__(self, infile, outfile, config, notifier, registers):
@@ -50,11 +53,12 @@ class CmdInterpreter(cmd.Cmd):
 
 
     def __listConverterNames(self):
-        return [ name for name in Converters.Converters ]
+        return [name for name in Converters.Converters]
 
     def do_add_hr(self, arg):
         try:
-            (label, unit, address, count, scanrate, readTopic, writeTopic, feedbackTopic, converter) = self.splitterRe.split(arg)
+            (label, unit, address, count, scanrate, readTopic, writeTopic, feedbackTopic, converter) = 
+                self.splitterRe.split(arg)
             self.__println("Label:         {0}".format(label))
             self.__println("Unit:          {0}".format(unit))
             self.__println("Address:       {0}".format(address))
