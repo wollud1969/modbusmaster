@@ -134,11 +134,11 @@ class CmdInterpreter(cmd.Cmd):
             unit = parseIntArbitraryBase(unit)
             address = parseIntArbitraryBase(address)
             scanrate = 0.0
-            r = RegisterDatapoint.CoilDatapoint(label=label, 
-                                                unit=unit, 
-                                                address=address, 
-                                                scanRate=datetime.timedelta(seconds=scanrate), 
-                                                subscribeTopic=writeTopic, 
+            r = RegisterDatapoint.CoilDatapoint(label=label,
+                                                unit=unit,
+                                                address=address,
+                                                scanRate=datetime.timedelta(seconds=scanrate),
+                                                subscribeTopic=writeTopic,
                                                 feedbackTopic=feedbackTopic)
             self.registers.append(r)
         except ValueError as e:

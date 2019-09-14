@@ -121,7 +121,7 @@ class CoilDatapoint(AbstractModbusDatapoint):
     def __init__(self, label=None, unit=None, address=None, scanRate=None, subscribeTopic=None,
                  feedbackTopic=None):
         super().__init__(label, unit, address, 1, scanRate, None)
-        self.argList = ['label', 'unit','address','scanRate','subscribeTopic', 'feedbackTopic']
+        self.argList = ['label', 'unit', 'address', 'scanRate', 'subscribeTopic', 'feedbackTopic']
         self.subscribeTopic = subscribeTopic
         self.feedbackTopic = feedbackTopic
         self.writeRequestValue = None
@@ -133,7 +133,7 @@ class CoilDatapoint(AbstractModbusDatapoint):
                 "writeCount: {9}, subscribeTopic: {10}, feedbackTopic: {11}"
                 .format(self.type, self.label, self.unit, self.address,
                         self.scanRate, self.enqueued, self.lastContact,
-                        self.errorCount, self.readCount, self.writeCount, 
+                        self.errorCount, self.readCount, self.writeCount,
                         self.subscribeTopic, self.feedbackTopic))
 
     def onMessage(self, value):
@@ -157,7 +157,7 @@ class CoilDatapoint(AbstractModbusDatapoint):
             result = client.write_coil(address=self.address,
                                        unit=self.unit,
                                        value=value)
-            logger.debug("Write result: {0!s}".format(result))                
+            logger.debug("Write result: {0!s}".format(result))
             if self.feedbackTopic:
                 pubQueue.put(MqttProcessor.PublishItem(self.feedbackTopic, str(value)))
             self.writeRequestValue = None
