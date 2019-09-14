@@ -3,6 +3,7 @@ class AbstractNotificationReceiver(object):
     def receiveNotification(self, arg):
         raise NotImplementedError
 
+
 class NotificationForwarder(object):
     def __init__(self):
         self.receivers = []

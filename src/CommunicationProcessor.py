@@ -12,6 +12,7 @@ import logging
 
 ERROR_PIN = 29
 
+
 class CommunicationProcessor(threading.Thread):
     def __init__(self, config, queue, pubQueue):
         super().__init__()
@@ -32,7 +33,6 @@ class CommunicationProcessor(threading.Thread):
         #                         timeout=1)
         return MyRS485.MyRS485(port=self.config.serialPort, baudrate=self.config.serialBaudRate, stopbits=1,
                                timeout=1)
-
 
     def run(self):
         client = ModbusSerialClient(method='rtu')
@@ -56,7 +56,3 @@ class CommunicationProcessor(threading.Thread):
                     client.socket = self.__getSerial()
             finally:
                 time.sleep(self.config.interCommDelay)
-
-
-
-

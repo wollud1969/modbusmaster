@@ -1,0 +1,29 @@
+stages:
+        - check
+        - deploy
+
+build:
+        stage: check
+        image: registry.gitlab.com/wolutator/base-build-env:latest
+        tags:
+                - hottis
+                - linux
+                - docker
+        script:
+                - for I in src/*.py; do python -m py_compile $I; done
+                - for I in src/*.py; do python -m pycodestyle --max-line-length=120 $I; done
+
+deploy:
+        stage: deploy
+        tags:
+                - hottis
+                - linux
+                - rpi
+                - modbus
+        only:
+                - deploy
+        script:
+                - sudo service modbusMaster stop
+                - cp src/*.py /opt/services/modbusMaster
+                - sudo service modbusMaster start
+

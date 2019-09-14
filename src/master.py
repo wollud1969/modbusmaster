@@ -36,7 +36,6 @@ if __name__ == "__main__":
     nf = NotificationForwarder.NotificationForwarder()
     logger.debug('infrastructure prepared')
 
-
     datapoints = RegisterDatapoint.loadRegisterList(config.registerFile)
     logger.debug('datapoints read')
 
@@ -56,7 +55,7 @@ if __name__ == "__main__":
     hb = Heartbeat.Heartbeat(config, pubQueue)
     hb.start()
     logger.debug('Heartbeat started')
-    
+
     qf = ScanRateConsideringQueueFeeder.ScanRateConsideringQueueFeeder(config, datapoints, queue)
     nf.register(qf)
     qf.start()

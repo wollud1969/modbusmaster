@@ -1,0 +1,19 @@
+[Unit]
+Description=ModbusMaster
+Wants=network-online.target
+After=network-online.target
+
+
+[Service]
+Type=simple
+GuessMainPID=yes
+ExecStart=/usr/bin/python master.py
+ExecStop=kill -SIGINT $mainpid
+Restart=on-failure
+WorkingDirectory=/opt/services/modbusMaster
+
+[Install]
+Alias=ModbusMaster
+WantedBy=multi-user.target
+
+
