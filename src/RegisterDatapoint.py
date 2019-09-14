@@ -116,11 +116,10 @@ class HoldingRegisterDatapoint(AbstractModbusDatapoint):
 
 
 class CoilDatapoint(AbstractModbusDatapoint):
-    def __init__(self, label=None, unit=None, address=None, scanRate=None, publishTopic=None, subscribeTopic=None,
+    def __init__(self, label=None, unit=None, address=None, scanRate=None, subscribeTopic=None,
                  feedbackTopic=None):
         super().__init__(label, unit, address, 1, scanRate, None)
-        self.argList = ['label', 'unit','address','scanRate','publishTopic', 'subscribeTopic', 'feedbackTopic']
-        self.publishTopic = publishTopic
+        self.argList = ['label', 'unit','address','scanRate','subscribeTopic', 'feedbackTopic']
         self.subscribeTopic = subscribeTopic
         self.feedbackTopic = feedbackTopic
         self.writeRequestValue = None
@@ -129,11 +128,11 @@ class CoilDatapoint(AbstractModbusDatapoint):
     def __str__(self):
         return ("{0}, {1}: unit: {2},  address: {3}, scanRate: {4}, "
                 "enqueued: {5}, lastContact: {6}, errorCount: {7}, readCount: {8}, "
-                "writeCount: {9}, publishTopic: {10}, subscribeTopic: {11}, feedbackTopic: {12}"
+                "writeCount: {9}, subscribeTopic: {10}, feedbackTopic: {11}"
                 .format(self.type, self.label, self.unit, self.address,
                         self.scanRate, self.enqueued, self.lastContact,
                         self.errorCount, self.readCount, self.writeCount, 
-                        self.publishTopic, self.subscribeTopic, self.feedbackTopic))
+                        self.subscribeTopic, self.feedbackTopic))
 
     def onMessage(self, value):
         self.writeRequestValue = value.decode()
@@ -157,21 +156,12 @@ class CoilDatapoint(AbstractModbusDatapoint):
                                        unit=self.unit,
                                        value=value)
             logger.debug("Write result: {0!s}".format(result))                
+            if self.feedbackTopic:
+                pubQueue.put(MqttProcessor.PublishItem(self.feedbackTopic, str(value)))
             self.writeRequestValue = None
         else:
-            # perform read operation
-            logger.debug("Coil, perform read operation")
-            self.readCount += 1
-            result = client.read_coils(address=self.address, 
-                                       unit=self.unit)
-            if type(result) in [ExceptionResponse, ModbusIOException]:
-                self.errorCount += 1
-                raise DatapointException(result)
-            logger.debug("{0}: {1!s}".format(self.label, result.getBit(0)))
-            value = result.getBit(0)
-            if self.publishTopic:
-                pubQueue.put(MqttProcessor.PublishItem(self.publishTopic, str(value)))
-            self.lastContact = datetime.datetime.now()
+            # no write op, strange
+            logger.debug("Coil, process call but no write value available, strange")
 
 
 class ReadOnlyDatapoint(AbstractModbusDatapoint):

@@ -117,7 +117,6 @@ class CmdInterpreter(cmd.Cmd):
             self.__println("Label:         {0}".format(label))
             self.__println("Unit:          {0}".format(unit))
             self.__println("Address:       {0}".format(address))
-            self.__println("ScanRate:      {0}".format(scanrate))
             self.__println("ReadTopic:     {0}".format(readTopic))
             self.__println("WriteTopic:    {0}".format(writeTopic))
             self.__println("FeedbackTopic: {0}".format(feedbackTopic))
@@ -130,7 +129,7 @@ class CmdInterpreter(cmd.Cmd):
                 feedbackTopic = None
             unit = parseIntArbitraryBase(unit)
             address = parseIntArbitraryBase(address)
-            scanrate = float(scanrate)
+            scanrate = 0.0
             r = RegisterDatapoint.CoilDatapoint(label=label, 
                                                 unit=unit, 
                                                 address=address, 
