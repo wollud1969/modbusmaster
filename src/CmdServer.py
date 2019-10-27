@@ -117,16 +117,13 @@ class CmdInterpreter(cmd.Cmd):
 
     def do_add_coil(self, arg):
         try:
-            (label, unit, address, scanrate, readTopic, writeTopic, feedbackTopic) = self.splitterRe.split(arg)
+            (label, unit, address, scanrate, writeTopic, feedbackTopic) = self.splitterRe.split(arg)
             self.__println("Label:         {0}".format(label))
             self.__println("Unit:          {0}".format(unit))
             self.__println("Address:       {0}".format(address))
-            self.__println("ReadTopic:     {0}".format(readTopic))
             self.__println("WriteTopic:    {0}".format(writeTopic))
             self.__println("FeedbackTopic: {0}".format(feedbackTopic))
 
-            if readTopic == 'None':
-                readTopic = None
             if writeTopic == 'None':
                 writeTopic = None
             if feedbackTopic == 'None':
@@ -146,7 +143,7 @@ class CmdInterpreter(cmd.Cmd):
 
     def help_add_coil(self):
         self.__println("Usage: add_coil <Label> <Unit> <Address> <ScanRate>")
-        self.__println("                <ReadTopic> <WriteTopic> <FeedbackTopic>")
+        self.__println("                <WriteTopic> <FeedbackTopic>")
         self.__println("Adds a coil")
         self.__println("DO NOT FORGET TO SAVE AFTERWARDS!")
         self.__println("---------------------------------------------------------------------")
@@ -155,7 +152,6 @@ class CmdInterpreter(cmd.Cmd):
         self.__println("<Address>                    Register address within the device")
         self.__println("<ScanRate>                   Scanrate in seconds (float), for write datapoints")
         self.__println("                             set to zero (0)")
-        self.__println("<ReadTopic>                  Topic to publish read data")
         self.__println("<WriteTopic>                 Topic to be subscribe to receive data to be")
         self.__println("                             written")
         self.__println("<FeedbackTopic>              Topic to publish feedback after a write process,")
