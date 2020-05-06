@@ -18,9 +18,9 @@ if __name__ == "__main__":
     config = Config.Config()
 
     logger = logging.getLogger()
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     fh = logging.FileHandler(config.logFile)
-    fh.setLevel(logging.DEBUG)
+    fh.setLevel(logging.INFO)
     ch = logging.StreamHandler()
     ch.setLevel(logging.ERROR)
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
